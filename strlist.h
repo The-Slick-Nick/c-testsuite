@@ -1,4 +1,17 @@
+/*
+strlist.h
+
+Provides a definition of a linked list where each
+element has both a title and content.
+
+Used by TestSuite for tracking error messages along
+with the functions that generated that error.
+*/
+
 #include <stdlib.h>
+
+#ifndef INCLUDE_GUARD_STRLIST
+#define INCLUDE_GUARD_STRLIST
 
 // Single element in a linked list
 typedef struct ListItem {
@@ -98,3 +111,5 @@ void StrList_append(StrList* list, char* title, char* content)
     }
     list->size++;
 }
+
+#endif
