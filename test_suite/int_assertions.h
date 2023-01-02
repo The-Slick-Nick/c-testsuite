@@ -131,13 +131,13 @@ int assert_true(TestSuite* ts, char* test_name, bool val)
 // Tests that a boolean value is false
 int assert_false(TestSuite* ts, char* test_name, bool val)
 {
-    if(val)
+    if(!val)
     {
         printf("*");
         ts->n_pass++;
         return TEST_SUCCESS;
     }
-    else if(!val)
+    else if(val)
     {
         printf("F");
         ts->n_fail++;
