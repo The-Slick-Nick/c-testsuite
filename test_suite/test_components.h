@@ -7,14 +7,10 @@ Core structures and macros for writing test cases
 #include <stdio.h>
 #include <stdlib.h>
 #include "strlist.h"
+#include "test_codes.h"
 
 #ifndef INCLUDE_GUARD_TEST_SUITE
 #define INCLUDE_GUARD_TEST_SUITE
-
-/* Result code macros */
-#define TEST_SUCCESS 0
-#define TEST_FAILURE -1
-#define TEST_ERROR -2
 
 
 // Uses a double-call to vnsprintf and parsing of a va_list to generate and return
@@ -83,8 +79,7 @@ int TestSuite_fail(TestSuite* ts, char* test_name, char* fail_msg)
     printf("F");
     ts->n_fail++;
 
-    // To handle both literals and malloc'ed pointers, make copies
-    StrList_append(ts->error_msg, format_string(test_name), format_string(fail_msg));
+    StrList_append(ts->error_msg, test_name, fail_msg, TEST_FAILURE);
     return TEST_FAILURE;
 
 }
@@ -96,8 +91,7 @@ int TestSuite_error(TestSuite* ts, char* test_name, char* error_msg)
     printf("E");
     ts->n_error++;
 
-    // To handle both literals and malloc'ed pointers, make copies
-    StrList_append(ts->error_msg, format_string(test_name), format_string(error_msg));
+    StrList_append(ts->error_msg, test_name, error_msg, TEST_ERROR);
     return TEST_ERROR;
 }
 
@@ -108,6 +102,18 @@ void TestSuite_print(TestSuite* ts)
     printf("______________________\n");
     for(_listitem* current=ts->error_msg->head;current!=NULL;current=current->next)
     {
+        switch(current->status)
+        {
+            case TEST_SUCCESS:
+                printf("SUCCESS\n");
+                break;
+            case TEST_FAILURE:
+                printf("FAIL\n");
+                break;
+            case TEST_ERROR:
+                printf("ERROR\n");
+                break;
+        }
         printf("%s\n", current->title);
         printf("%s\n", current->content);
         printf("______________________\n");
