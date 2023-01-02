@@ -30,21 +30,21 @@ typedef struct StrList {
 _listitem* _listitem_init(char* title, char* content)
 // Allocate and return a ListItem struct
 {
-    _listitem* to_return = (_listitem*)malloc(sizeof(_listitem));
-    to_return->title = title;
-    to_return->content = content;
-    to_return->next = NULL;
-    return to_return;
+    _listitem* li = (_listitem*)malloc(sizeof(_listitem));
+    li->title = title;
+    li->content = content;
+    li->next = NULL;
+    return li;
 }
 
 StrList* StrList_init()
 // Allocate and return a StrList struct
 {
-    StrList* to_return = (StrList*)malloc(sizeof(StrList));
-    to_return->head = NULL;
-    to_return->tail = NULL;
-    to_return->size = 0;
-    return to_return;
+    StrList* list = (StrList*)malloc(sizeof(StrList));
+    list->head = NULL;
+    list->tail = NULL;
+    list->size = 0;
+    return list;
 }
 
 // Frees a ListItem's char arrays then frees ListItem
