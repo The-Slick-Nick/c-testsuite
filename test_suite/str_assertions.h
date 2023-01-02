@@ -50,3 +50,16 @@ int assert_equal_str(TestSuite* ts, char* test_name, char* val1, char* val2)
 
     return TestSuite_pass(ts);
 }
+
+int assert_not_equal_str(TestSuite* ts, char* test_name, char* val1, char* val2)
+{
+    if(strcmp(val1, val2) != 0)
+        return TestSuite_pass(ts);
+
+    char* fail_msg = format_string(
+        "Strings equal\n%s\n%s\n", val1, val2
+    );
+    int test_status = TestSuite_fail(ts, test_name, fail_msg);
+    free(fail_msg);
+    return test_status;
+}
