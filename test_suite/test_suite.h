@@ -40,3 +40,4 @@ Then, in a main method, do:
 #include "test_components.h"
 #include "int_assertions.h"
 #include "str_assertions.h"
+#include "float_assertions.h"
