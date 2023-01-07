@@ -16,15 +16,10 @@ int assert_equal_str(TestSuite* ts, char* val1, char* val2)
     char* msg;
 
     if (len1 != len2)
-    {
-        msg = format_string(
-            "String lengths differ: %d vs %d\n      %s\n      %s",
+        return TestSuite_fail(
+            ts, "String lengths differ: %d vs %d\n      %s\n      %s",
             len1, len2, val1, val2
         );
-        return_code = TestSuite_fail(ts, msg);
-        free(msg);
-        return return_code;
-    }
 
     for(idx = 0; idx < len1; idx++)
     {
@@ -39,37 +34,22 @@ int assert_equal_str(TestSuite* ts, char* val1, char* val2)
             }
             *(indicator + idx) = '^';
 
-            msg = format_string(
-                "Strings differ at index %d\n      %s\n      %s\n      %s",
+            int return_code = TestSuite_fail(
+                ts, "Strings differ at index %d\n      %s\n      %s\n      %s",
                 idx, val1, val2, indicator
             );
-            return_code = TestSuite_fail(ts, msg);
             free(indicator);
-            free(msg);
             return return_code;
         }
     }
 
-    msg = format_string("Strings equal\n      %s\n      %s", val1, val2);
-    return_code = TestSuite_pass(ts, msg);
-    free(msg);
-    return return_code;
+    return TestSuite_pass(ts, "Strings equal\n      %s\n      %s", val1, val2);
 }
 
 int assert_not_equal_str(TestSuite* ts, char* val1, char* val2)
 {
-    char* msg;
-    int return_code;
-    if(strcmp(val1, val2) != 0)
-    {
-        msg = format_string("Strings differ\n      %s\n      %s", val1, val2);
-        return_code = TestSuite_pass(ts, msg);
-    }
+    if (strcmp(val1, val2) != 0)
+        return TestSuite_pass(ts, "Strings differ\n      %s\n      %s", val1, val2);
     else
-    {
-        msg = format_string("Strings equal\n      %s\n      %s", val1, val2);
-        return_code = TestSuite_fail(ts, msg);
-    }
-    free(msg);
-    return return_code;
+        return TestSuite_fail(ts, "Strings equal\n      %s\n      %s", val1, val2);
 }

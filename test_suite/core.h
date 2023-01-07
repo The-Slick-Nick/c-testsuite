@@ -4,9 +4,13 @@ core.h
 Core components for my janky testing framework.
 
 Definitions/methods for structs:
-TestSuite
-_caseitem
-_assertionitem
+    TestSuite
+    _caseitem
+    _assertionitem
+
+Any methods/structs preceded with an underscore
+(_caseitem, _assertionitem, and associated methods) should be considered private
+and should probably never be directly called outside of this file.
 
 ----------------------------------------------------------------------------------------*/
 #include <stdlib.h>
@@ -51,6 +55,7 @@ char* format_string(char* base_str, ...)
 }
 
 // Format string as above with an already-parsed va_list given
+// Returns a newly-allocated character array pointer
 char* format_string_valist(char* base_str, va_list arg_list)
 {
     int length = 1 + vsnprintf(NULL, 0, base_str, arg_list);
@@ -97,26 +102,31 @@ typedef struct {
 
 /* INITIALIZATION & DECONSTRUCTION */
 
-// Assertion Item
+// Assertion Item Initialization
+// Private method
 _assertionitem* _assertionitem_init(int status_code, char* msg)
 {
+    // NOTE THAT msg SHOULD ALWAYS BE A MALLOC'ED POINTER TO A STRING,
+    // NEVER A STRING LITERAL. These should always originate from a call
+    // to format_string_valist.
+    // 
+    // Furthermore, this method should never be "publicly" called and should only
+    // ever originate from one of the two chains:
+    // TestSuite_pass -> _testcase_addAssertion -> _assertionitem_init (here)
+    // TestSuite_fail -> _testcase_addAssertion -> _assertionitem_init (here)
+
+
     _assertionitem* ass = (_assertionitem*)malloc(sizeof(_assertionitem));
 
     ass->status_code = status_code;
     ass->next = NULL;
 
     // Add message
-    if (msg == NULL)
-        ass->msg = NULL;
-    else
-    {
-        ass->msg = (char*)malloc((1 + strlen(msg)) * sizeof(char));
-        strcpy(ass->msg, msg);
-    }
-
+    ass->msg = msg;
     return ass;
 }
 
+// Private method
 void _assertionitem_deconstruct(_assertionitem* ass)
 {
     if (ass == NULL)
@@ -135,6 +145,7 @@ void _assertionitem_deconstruct(_assertionitem* ass)
 }
 
 // Case Item
+// Private method
 _caseitem* _caseitem_init(char* case_name)
 {
     _caseitem* citem = (_caseitem*)malloc(sizeof(_caseitem));
@@ -157,6 +168,7 @@ _caseitem* _caseitem_init(char* case_name)
 }
 
 // Starting at head _caseitem, traverse all _caseitems and free any allocated memory
+// Private method
 void _caseitem_deconstruct(_caseitem* citem)
 {
     if (citem == NULL)
@@ -177,6 +189,7 @@ void _caseitem_deconstruct(_caseitem* citem)
 }
 
 // TestSuite
+// Public method
 TestSuite* TestSuite_init()
 {
     TestSuite* ts = (TestSuite*)malloc(sizeof(TestSuite));
@@ -204,6 +217,7 @@ void TestSuite_deconstruct(TestSuite* ts)
 
 /* PRINT/AUDIT METHODS */
 
+// Private method
 void _assertionitem_print(_assertionitem* ass)
 {
     if (ass == NULL)
@@ -230,6 +244,7 @@ void _assertionitem_print(_assertionitem* ass)
     printf(": %s\n", ass->msg);
 }
 
+// Private method
 void _caseitem_print(_caseitem* ci)
 {
     if (ci == NULL)
@@ -256,7 +271,7 @@ void _caseitem_print(_caseitem* ci)
     printf("Total: %d\n", ci->num_tests);
 }
 
-
+// Public method
 void TestSuite_print(TestSuite* ts)
 {
     for (_caseitem* cur = ts->case_head; cur != NULL; cur = cur->next)
@@ -279,7 +294,8 @@ void TestSuite_print(TestSuite* ts)
 /* ADDING ASSERTIONS/CASES */
 
 // Shorthand to add an _assertionitem to a provided _caseitem
-void _testcase_addAssertion(_caseitem* citem, int status_code, char* msg)
+// Private method
+void _caseitem_addAssertion(_caseitem* citem, int status_code, char* msg)
 {
     _assertionitem* new_ass = _assertionitem_init(status_code, msg);
     if (citem->ass_head == NULL)
@@ -293,6 +309,7 @@ void _testcase_addAssertion(_caseitem* citem, int status_code, char* msg)
 
 // A _caseitem is considered incomplete until it has been committed. This method commits
 // it, adding success/fail/total counts to TestSuite and flagging it as considered
+// Public method
 int TestSuite_commitCase(TestSuite* ts)
 {
     if (ts->case_tail == NULL)
@@ -317,6 +334,7 @@ int TestSuite_commitCase(TestSuite* ts)
 
 // Adds a new test case. First commits the old running one at tail _caseitem, then
 // appends a brand new one to the right side
+// Public method
 int TestSuite_newCase(TestSuite* ts, char* case_name)
 {
     // New case - commit the old one
@@ -330,10 +348,12 @@ int TestSuite_newCase(TestSuite* ts, char* case_name)
     if (ts->case_tail != NULL)
         ts->case_tail->next = new_case;
 
+    // new_case is now the "current" test case under consideration
     ts->case_tail = new_case;
 }
 
-// Call to indicate a test passed on the current running _caseitem
+// Call to indicate an assertion passed on the current running _caseitem
+// Public method
 int TestSuite_pass(TestSuite* ts, char* msg, ...)
 {
     if (ts->case_tail == NULL)
@@ -347,16 +367,16 @@ int TestSuite_pass(TestSuite* ts, char* msg, ...)
     pass_msg = format_string_valist(msg, arg_list);
 
     // Cases are added to the right side
-    _testcase_addAssertion(ts->case_tail, STATUS_CODE_PASS, pass_msg);
+    _caseitem_addAssertion(ts->case_tail, STATUS_CODE_PASS, pass_msg);
     ts->case_tail->num_pass++;
     ts->case_tail->num_tests++;
 
-    free(pass_msg);
     va_end(arg_list);
     return 0;
 }
 
-// Call to indicate a test failed on the current running _caseitem
+// Call to indicate an assertion failed on the current running _caseitem
+// Public method
 int TestSuite_fail(TestSuite* ts, char* msg, ...)
 {
     if (ts->case_tail == NULL)
@@ -370,11 +390,10 @@ int TestSuite_fail(TestSuite* ts, char* msg, ...)
     fail_msg = format_string_valist(msg, arg_list);
 
     // Cases are added to the right side
-    _testcase_addAssertion(ts->case_tail, STATUS_CODE_FAIL, fail_msg);
+    _caseitem_addAssertion(ts->case_tail, STATUS_CODE_FAIL, fail_msg);
     ts->case_tail->num_fail++;
     ts->case_tail->num_tests++;
 
-    free(fail_msg);
     va_end(arg_list);
     return 0;
 }
