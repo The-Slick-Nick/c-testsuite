@@ -1,8 +1,8 @@
-/*
+/*========================================================================================
 double_assertions.h
 
 Assertion functions revolving around doubleing point numbers
-*/
+========================================================================================*/
 #include <stdbool.h>
 #include "core.h"
 
