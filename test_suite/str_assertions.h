@@ -18,7 +18,8 @@ int assert_equal_str(TestSuite* ts, char* val1, char* val2)
     if (len1 != len2)
     {
         msg = format_string(
-            "String lengths differ: %d vs %d\n      %s\n      %s", len1, len2, val1, val2
+            "String lengths differ: %d vs %d\n      %s\n      %s",
+            len1, len2, val1, val2
         );
         return_code = TestSuite_fail(ts, msg);
         free(msg);

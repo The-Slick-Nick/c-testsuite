@@ -50,6 +50,16 @@ char* format_string(char* base_str, ...)
     return to_return;
 }
 
+// Format string as above with an already-parsed va_list given
+char* format_string_valist(char* base_str, va_list arg_list)
+{
+    int length = 1 + vsnprintf(NULL, 0, base_str, arg_list);
+    char* to_return = (char*)malloc(length * sizeof(char));
+
+    vsnprintf(to_return, length, base_str, arg_list);
+    return to_return;
+}
+
 /* STRUCT DEFINITIONS */
 
 // _assertionitem - individual assertion element - one per assertion per test case
@@ -324,30 +334,48 @@ int TestSuite_newCase(TestSuite* ts, char* case_name)
 }
 
 // Call to indicate a test passed on the current running _caseitem
-int TestSuite_pass(TestSuite* ts, char* msg)
+int TestSuite_pass(TestSuite* ts, char* msg, ...)
 {
     if (ts->case_tail == NULL)
         return -1;
 
+    // Handle any formatting passed by using format_string_valist
+    char* pass_msg;
+    va_list arg_list;
+    va_start(arg_list, msg);
+
+    pass_msg = format_string_valist(msg, arg_list);
+
     // Cases are added to the right side
-    _testcase_addAssertion(ts->case_tail, STATUS_CODE_PASS, msg);
+    _testcase_addAssertion(ts->case_tail, STATUS_CODE_PASS, pass_msg);
     ts->case_tail->num_pass++;
     ts->case_tail->num_tests++;
 
+    free(pass_msg);
+    va_end(arg_list);
     return 0;
 }
 
 // Call to indicate a test failed on the current running _caseitem
-int TestSuite_fail(TestSuite* ts, char* msg)
+int TestSuite_fail(TestSuite* ts, char* msg, ...)
 {
     if (ts->case_tail == NULL)
         return -1;
 
+    // Handle any formatting passed by using format_string_valist
+    char* fail_msg;
+    va_list arg_list;
+    va_start(arg_list, msg);
+
+    fail_msg = format_string_valist(msg, arg_list);
+
     // Cases are added to the right side
-    _testcase_addAssertion(ts->case_tail, STATUS_CODE_FAIL, msg);
+    _testcase_addAssertion(ts->case_tail, STATUS_CODE_FAIL, fail_msg);
     ts->case_tail->num_fail++;
     ts->case_tail->num_tests++;
 
+    free(fail_msg);
+    va_end(arg_list);
     return 0;
 }
 

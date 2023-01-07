@@ -10,7 +10,12 @@ TestSuite* ts;
                                             TestSuite_print(ts);\
                                             TestSuite_deconstruct(ts)
 
-#define ADD_CASE(func, name)                TestSuite_newCase(ts, name); func()                
+#define ADD_CASE(func, name)                TestSuite_newCase(ts, name); func() 
+#define TEST_PASS(msg)                      TestSuite_pass(ts, msg)
+#define TEST_FAIL(msg)                      TestSuite_fail(ts, msg)   
+// Below is for adding formatting ala printf("%d", 1) to a manual pass/fail message
+#define TEST_PASS_FMT(msg, ...)             TestSuite_pass(ts, msg, __VA_ARGS__)
+#define TEST_FAIL_FMT(msg, ...)             TestSuite_fail(ts, msg, __VA_ARGS__)            
 
 
 #define ASSERT_EQUAL_INT(val1, val2)        assert_equal_int(ts, val1, val2)
