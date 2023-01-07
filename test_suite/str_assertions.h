@@ -4,25 +4,25 @@ str_assertions.h
 Assertion functions revolving around strings
 */
 #include <string.h>
-#include "test_components.h"
+#include "core.h"
 
-int assert_equal_str(TestSuite* ts, char* test_name, char* val1, char* val2)
+int assert_equal_str(TestSuite* ts, char* val1, char* val2)
 {
     int idx;
     int len1 = strlen(val1);
     int len2 = strlen(val2);
-    int test_status;
+    int return_code;
     char chr1, chr2;
-    char* fail_msg;
+    char* msg;
 
-    if(len1 != len2)
+    if (len1 != len2)
     {
-        fail_msg = format_string(
-            "String lengths differ: %d vs %d\n%s\n%s", len1, len2, val1, val2
+        msg = format_string(
+            "String lengths differ: %d vs %d\n      %s\n      %s", len1, len2, val1, val2
         );
-        test_status = TestSuite_fail(ts, test_name, fail_msg);
-        free(fail_msg);
-        return test_status;
+        return_code = TestSuite_fail(ts, msg);
+        free(msg);
+        return return_code;
     }
 
     for(idx = 0; idx < len1; idx++)
@@ -38,28 +38,37 @@ int assert_equal_str(TestSuite* ts, char* test_name, char* val1, char* val2)
             }
             *(indicator + idx) = '^';
 
-            fail_msg = format_string(
-                "Strings differ at index %d\n%s\n%s\n%s", idx, val1, val2, indicator
+            msg = format_string(
+                "Strings differ at index %d\n      %s\n      %s\n      %s",
+                idx, val1, val2, indicator
             );
-            test_status = TestSuite_fail(ts, test_name, fail_msg);
+            return_code = TestSuite_fail(ts, msg);
             free(indicator);
-            free(fail_msg);
-            return test_status;
+            free(msg);
+            return return_code;
         }
     }
 
-    return TestSuite_pass(ts);
+    msg = format_string("Strings equal\n      %s\n      %s", val1, val2);
+    return_code = TestSuite_pass(ts, msg);
+    free(msg);
+    return return_code;
 }
 
-int assert_not_equal_str(TestSuite* ts, char* test_name, char* val1, char* val2)
+int assert_not_equal_str(TestSuite* ts, char* val1, char* val2)
 {
+    char* msg;
+    int return_code;
     if(strcmp(val1, val2) != 0)
-        return TestSuite_pass(ts);
-
-    char* fail_msg = format_string(
-        "Strings equal\n%s\n%s\n", val1, val2
-    );
-    int test_status = TestSuite_fail(ts, test_name, fail_msg);
-    free(fail_msg);
-    return test_status;
+    {
+        msg = format_string("Strings differ\n      %s\n      %s", val1, val2);
+        return_code = TestSuite_pass(ts, msg);
+    }
+    else
+    {
+        msg = format_string("Strings equal\n      %s\n      %s", val1, val2);
+        return_code = TestSuite_fail(ts, msg);
+    }
+    free(msg);
+    return return_code;
 }

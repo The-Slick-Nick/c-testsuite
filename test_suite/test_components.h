@@ -42,6 +42,7 @@ typedef struct TestSuite{
     int n_pass;         // Number of test successes
     int n_fail;         // Number of test failures
     int n_error;          // Number of test errors
+    char* current_name; // Name of current test running
     StrList* error_msg; // Linked list of error messages
 } TestSuite;
 
@@ -54,6 +55,8 @@ TestSuite* TestSuite_init()
     ts->n_pass = 0;
     ts->n_fail = 0;
     ts->n_error = 0;
+    ts->current_name = (char*)malloc(sizeof(char));
+    strcpy(ts->current_name, "");
     ts->error_msg = StrList_init();
     return ts;
 }
@@ -73,25 +76,32 @@ int TestSuite_pass(TestSuite* ts)
     return TEST_SUCCESS;
 }
 
+int TestSuite_updateName(TestSuite* ts, char* new_name)
+{
+    free(ts->current_name);
+    ts->current_name = (char*)malloc((1 + strlen(new_name)) * sizeof(char));
+    strcpy(ts->current_name, new_name);
+}
+
 // Call to indicate a test has failed. Provide a test name failure message.
-int TestSuite_fail(TestSuite* ts, char* test_name, char* fail_msg)
+int TestSuite_fail(TestSuite* ts, char* fail_msg)
 {
     printf("F");
     ts->n_fail++;
 
-    StrList_append(ts->error_msg, test_name, fail_msg, TEST_FAILURE);
+    StrList_append(ts->error_msg, ts->current_name, fail_msg, TEST_FAILURE);
     return TEST_FAILURE;
 
 }
 
 // Call to indicate unexpected behavior or an error has occured. Provide a test name and
 // error message
-int TestSuite_error(TestSuite* ts, char* test_name, char* error_msg)
+int TestSuite_error(TestSuite* ts, char* error_msg)
 {
     printf("E");
     ts->n_error++;
 
-    StrList_append(ts->error_msg, test_name, error_msg, TEST_ERROR);
+    StrList_append(ts->error_msg, ts->current_name, error_msg, TEST_ERROR);
     return TEST_ERROR;
 }
 
