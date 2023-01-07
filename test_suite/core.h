@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------------------------
+/*========================================================================================
 core.h
 
 Core components for my janky testing framework.
@@ -12,7 +12,9 @@ Any methods/structs preceded with an underscore
 (_caseitem, _assertionitem, and associated methods) should be considered private
 and should probably never be directly called outside of this file.
 
-----------------------------------------------------------------------------------------*/
+========================================================================================*/
+
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -29,7 +31,10 @@ and should probably never be directly called outside of this file.
 #define PRINT_SINGLE_LINE   printf("------------------------------\n")
 #define PRINT_DOUBLE_LINE   printf("==============================\n")
 
-/* HELPER METHOD DEFINITIONS */
+
+/*----------------------------------------------------------------------------------------
+HELPER METHOD DEFINITIONS
+----------------------------------------------------------------------------------------*/
 
 // Uses a double-call to vnsprintf and parsing of a va_list to generate and return
 // a pointer to a formatted variable length message. If no variable args are provided,
@@ -65,7 +70,11 @@ char* format_string_valist(char* base_str, va_list arg_list)
     return to_return;
 }
 
-/* STRUCT DEFINITIONS */
+
+/*----------------------------------------------------------------------------------------
+STRUCT DEFINITIONS
+----------------------------------------------------------------------------------------*/
+
 
 // _assertionitem - individual assertion element - one per assertion per test case
 typedef struct TestAssertion {
@@ -100,7 +109,9 @@ typedef struct {
 } TestSuite;
 
 
-/* INITIALIZATION & DECONSTRUCTION */
+/*----------------------------------------------------------------------------------------
+INITIALIZATION & DECONSTRUCTION 
+----------------------------------------------------------------------------------------*/
 
 // Assertion Item Initialization
 // Private method
@@ -205,6 +216,7 @@ TestSuite* TestSuite_init()
     ts->case_tail = NULL;
 }
 
+// Public method
 void TestSuite_deconstruct(TestSuite* ts)
 {
     if (ts == NULL)
@@ -215,7 +227,9 @@ void TestSuite_deconstruct(TestSuite* ts)
 }
 
 
-/* PRINT/AUDIT METHODS */
+/*----------------------------------------------------------------------------------------
+PRINT METHODS
+----------------------------------------------------------------------------------------*/
 
 // Private method
 void _assertionitem_print(_assertionitem* ass)
@@ -290,8 +304,9 @@ void TestSuite_print(TestSuite* ts)
 
 }
 
-
-/* ADDING ASSERTIONS/CASES */
+/*----------------------------------------------------------------------------------------
+ASSERTION/TEST CASE MANAGEMENT
+----------------------------------------------------------------------------------------*/
 
 // Shorthand to add an _assertionitem to a provided _caseitem
 // Private method

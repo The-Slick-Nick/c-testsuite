@@ -1,8 +1,8 @@
-/*
+/*========================================================================================
 int_assertions.h
 
 Assertion functions revolving around inting point numbers
-*/
+========================================================================================*/
 #include <stdbool.h>
 #include "core.h"
 

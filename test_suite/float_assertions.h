@@ -1,8 +1,8 @@
-/*
+/*========================================================================================
 float_assertions.h
 
 Assertion functions revolving around floating point numbers
-*/
+========================================================================================*/
 #include <stdbool.h>
 #include "core.h"
 
