@@ -266,8 +266,8 @@ void _caseitem_print(_caseitem* ci)
         _assertionitem_print(cur);
     }
     PRINT_SINGLE_LINE;
-    printf("Passed: %d\n", ci->num_pass);
-    printf("Failed: %d\n", ci->num_fail);
+    printf("[%dP] ", ci->num_pass);
+    printf("[%dF] ", ci->num_fail);
     printf("Total: %d\n", ci->num_tests);
 }
 
