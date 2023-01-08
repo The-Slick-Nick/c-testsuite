@@ -1,7 +1,7 @@
 /*========================================================================================
 core.h
 
-Core components for my janky testing framework.
+Core components for my janky testing framework EWENIT
 
 Definitions/methods for structs:
     TestSuite
@@ -294,13 +294,10 @@ void TestSuite_print(TestSuite* ts)
         _caseitem_print(cur);
     }
     PRINT_DOUBLE_LINE;
-    printf("Assertions passed: %d\n", ts->total_pass);
-    printf("Assertions failed: %d\n", ts->total_fail);
-    printf("Total Assertions: %d\n", ts->total_tests);
-    printf("\n");
-    printf("Test Cases passed: %d\n", ts->cases_pass);
-    printf("Test Cases failed: %d\n", ts->cases_fail);
-    printf("Total Test Cases: %d\n", ts->num_cases);
+    printf("Assertions\n");
+    printf("[%dP] [%dF] Total: %d", ts->total_pass, ts->total_fail, ts->total_tests);
+    printf("\n\nTest Cases\n");
+    printf("[%dP] [%dF] Total: %d", ts->cases_pass, ts->cases_fail, ts->num_cases);
 
 }
 

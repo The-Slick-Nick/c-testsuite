@@ -30,7 +30,7 @@ int assert_equal_str(TestSuite* ts, char* val1, char* val2)
             char* indicator = (char*)malloc((idx + 1) * sizeof(char));
             for(int i = 0; i < idx; i++)
             {
-                *(indicator + i) = ' ';
+                *(indicator + i) = '-';
             }
             *(indicator + idx) = '^';
 
