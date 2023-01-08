@@ -360,7 +360,6 @@ void TestSuite_print(TestSuite* ts)
 
 }
 
-
 // Public method
 void TestSuite_printCompact(TestSuite* ts)
 {
@@ -376,6 +375,7 @@ void TestSuite_printCompact(TestSuite* ts)
     printf("Test Cases");
     printf("[%dP] [%dF] Total: %d\n", ts->cases_pass, ts->cases_fail, ts->num_cases);
 }
+
 /*----------------------------------------------------------------------------------------
 ASSERTION/TEST CASE MANAGEMENT
 ----------------------------------------------------------------------------------------*/

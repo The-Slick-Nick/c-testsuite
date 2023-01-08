@@ -12,4 +12,5 @@ Each extension should consist of
 ========================================================================================*/
 
 // Extension files should all be included here
-#include "test_extension.h"
+#include "example_extension1.h"
+#include "example_extension2.h"

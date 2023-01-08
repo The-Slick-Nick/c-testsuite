@@ -47,4 +47,3 @@ Version 0.7.0
 #include "extensions/extensions_master.h"
 
 TestSuite* ts;
-
