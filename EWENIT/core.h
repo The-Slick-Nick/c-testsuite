@@ -232,6 +232,7 @@ PRINT METHODS
 ----------------------------------------------------------------------------------------*/
 
 // Private method
+// Prints the error status and message for an individual assertion
 void _assertionitem_print(_assertionitem* ass)
 {
     if (ass == NULL)
@@ -259,12 +260,37 @@ void _assertionitem_print(_assertionitem* ass)
 }
 
 // Private method
+// Compact printing: Prints a one-line list of successes/failures of an assertionitem
+// i.e. PFFPFPPFF
+void _assertionitem_printCompact(_assertionitem* ass)
+{
+    if (ass == NULL)
+        return;
+
+    switch (ass->status_code)
+    {
+        case STATUS_CODE_PASS:
+            printf("P");
+            break;
+        case STATUS_CODE_FAIL:
+            printf("F");
+            break;
+        default:
+            break;
+    }
+}
+
+// Private method
+// Prints a summary of success/failure for all assertions in a given test case
 void _caseitem_print(_caseitem* ci)
 {
     if (ci == NULL)
         return;
 
     if (ci->num_tests == 0)
+        return;
+
+    if (!ci->is_committed)
         return;
 
     // Print name if one was given
@@ -285,6 +311,38 @@ void _caseitem_print(_caseitem* ci)
     printf("Total: %d\n", ci->num_tests);
 }
 
+// Private method
+// Compact printing of a case item. Prints a one-line summary of this test case
+void _caseitem_printCompact(_caseitem* ci)
+{
+    if (ci == NULL)
+        return;
+
+    if (ci->num_tests == 0)
+        return;
+
+    if (!ci->is_committed)
+        return;
+
+    if (ci->name == NULL)
+        printf("UNTITLED: ");
+    else
+        printf("%s: ", ci->name);
+
+    // Print overall status for _caseitem
+    if (ci->num_fail > 0)
+        printf("Failed ");
+    else
+        printf("Passed ");
+
+    printf("[");
+    for (_assertionitem* cur = ci->ass_head; cur != NULL; cur = cur->next)
+    {
+        _assertionitem_printCompact(cur);
+    }
+    printf("]");
+}
+
 // Public method
 void TestSuite_print(TestSuite* ts)
 {
@@ -292,6 +350,7 @@ void TestSuite_print(TestSuite* ts)
     {
         PRINT_DOUBLE_LINE;
         _caseitem_print(cur);
+        printf("\n");
     }
     PRINT_DOUBLE_LINE;
     printf("Assertions\n");
@@ -301,6 +360,22 @@ void TestSuite_print(TestSuite* ts)
 
 }
 
+
+// Public method
+void TestSuite_printCompact(TestSuite* ts)
+{
+    PRINT_DOUBLE_LINE;
+    for (_caseitem* cur = ts->case_head; cur != NULL; cur = cur->next)
+    {
+        _caseitem_printCompact(cur);
+        printf("\n");
+    }
+    PRINT_DOUBLE_LINE;
+    printf("Assertions ");
+    printf("[%dP] [%dF] Total: %d\n", ts->total_pass, ts->total_fail, ts->total_tests);
+    printf("Test Cases");
+    printf("[%dP] [%dF] Total: %d\n", ts->cases_pass, ts->cases_fail, ts->num_cases);
+}
 /*----------------------------------------------------------------------------------------
 ASSERTION/TEST CASE MANAGEMENT
 ----------------------------------------------------------------------------------------*/
