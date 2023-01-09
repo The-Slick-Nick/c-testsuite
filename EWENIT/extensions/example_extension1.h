@@ -4,8 +4,13 @@ Example extension 1
 Defining an assert function and an assert macro invoking that function
 ----------------------------------------------------------------------------------------*/
 
-// This line must be included in order to define the function
-#include "../core.h"
+// core.h header must be included when defining a function. This can be done either
+// by
+// #include "../core.h"
+// or 
+// #include "../EWENIT.h"
+// EWENIT.h is slightly preferred, as it includes core.h and helpful utility macros
+#include "../EWENIT.h"
 
 // Define the assertion macro to invoke the function
 #define ASSERT_EQUALS_SIX(val1) assert_equals_six(ts, val1)
