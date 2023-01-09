@@ -56,11 +56,23 @@ TestSuite* ts;
 #define ASSERT_EQUAL_INT(val1, val2)            ERROR_CHECK(assert_equal_int(ts, val1, val2))
 #define ASSERT_NOT_EQUAL_INT(val1, val2)        ERROR_CHECK(assert_not_equal_int(ts, val1, val2))
 #define ASSERT_GREATER_THAN_INT(val1, val2)     ERROR_CHECK(assert_greater_than_int(ts, val1, val2))
+
+
 #define ASSERT_EQUAL_STR(val1, val2)            ERROR_CHECK(assert_equal_str(ts, val1, val2))
 #define ASSERT_NOT_EQUAL_STR(val1, val2)        ERROR_CHECK(assert_not_equal_str(ts, val1, val2))
+
+
 #define ASSERT_EQUAL_FLOAT(val1, val2)          ERROR_CHECK(assert_equal_float(ts, val1, val2))
 #define ASSERT_NOT_EQUAL_FLOAT(val1, val2)      ERROR_CHECK(assert_not_equal_float(ts, val1, val2))
 #define ASSERT_GREATER_THAN_FLOAT(val1, val2)   ERROR_CHECK(assert_greater_than_float(ts, val1, val2))
+#define ASSERT_ALMOST_EQUAL_FLOAT(val1, val2)   ERROR_CHECK(assert_almost_equal_float(ts, val1, val2))
+#define ASSERT_NOT_ALMOST_EQUAL_FLOAT(val1, val2) \
+                                                ERROR_CHECK(assert_not_almost_equal_float(ts, val1, val2))
+
+
 #define ASSERT_EQUAL_DOUBLE(val1, val2)         ERROR_CHECK(assert_equal_double(ts, val1, val2))
 #define ASSERT_NOT_EQUAL_DOUBLE(val1, val2)     ERROR_CHECK(assert_not_equal_double(ts, val1, val2))
 #define ASSERT_GREATER_THAN_DOUBLE(val1, val2)  ERROR_CHECK(assert_greater_than_double(ts, val1, val2))
+#define ASSERT_ALMOST_EQUAL_DOUBLE(val1, val2)  ERROR_CHECK(assert_almost_equal_double(ts, val1, val2))
+#define ASSERT_NOT_ALMOST_EQUAL_DOUBLE(val1, val2) \
+                                                ERROR_CHECK(assert_not_almost_equal_double(ts, val1, val2))
