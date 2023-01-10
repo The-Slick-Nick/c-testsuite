@@ -24,16 +24,16 @@
 
 // Allow manual PASS/FAIL macros to use formatted arguments if compiler supports it
 #if OPTIONAL_VARIADIC_SUPPORTED
-    #define TEST_PASS(msg, ...)                 TestSuite_pass(ts, msg, ##__VA_ARGS__)
-    #define TEST_FAIL(msg, ...)                 TestSuite_fail(ts, msg, ##__VA_ARGS__)
+    #define TEST_PASS(msg, ...)                 TestSuite_pass(ts, __LINE__, msg, ##__VA_ARGS__)
+    #define TEST_FAIL(msg, ...)                 TestSuite_fail(ts, __LINE__, msg, ##__VA_ARGS__)
 #else
-    #define TEST_PASS(msg)                      TestSuite_pass(ts, msg)
-    #define TEST_FAIL(msg)                      TestSuite_fail(ts, msg)
+    #define TEST_PASS(msg)                      TestSuite_pass(ts, __LINE__, msg)
+    #define TEST_FAIL(msg)                      TestSuite_fail(ts, __LINE__, msg)
 #endif
 
 // Provide a formatting-supported version of the macro regardless
-#define TEST_PASS_FMT(msg, ...)                 TestSuite_pass(ts, msg, __VA_ARGS__)
-#define TEST_FAIL_FMT(msg, ...)                 TestSuite_fail(ts, msg, __VA_ARGS__)
+#define TEST_PASS_FMT(msg, ...)                 TestSuite_pass(ts, __LINE__, msg, __VA_ARGS__)
+#define TEST_FAIL_FMT(msg, ...)                 TestSuite_fail(ts, __LINE__, msg, __VA_ARGS__)
 
 
 #define ERROR_CHECK(x)                          if (x < 0) do \

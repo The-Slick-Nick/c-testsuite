@@ -12,6 +12,6 @@ Defining an assert macro directly without the function
 // The macro defines the code for the assertion directly
 #define ASSERT_EQUALS_SEVEN(val1) \
     if (val1 == 7)\
-        TestSuite_pass(ts, "%d == 7", val1);\
+        TestSuite_pass(ts, __LINE__, "%d == 7", val1);\
     else\
-        TestSuite_fail(ts, "%d != 7", val1);
+        TestSuite_fail(ts, __LINE__, "%d != 7", val1);

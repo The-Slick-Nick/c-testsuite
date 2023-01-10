@@ -79,6 +79,7 @@ STRUCT DEFINITIONS
 // _assertionitem - individual assertion element - one per assertion per test case
 typedef struct TestAssertion {
     int status_code;            // Integer representing status of an assertion
+    int line_num;               // Row number assertion was called from
     char* msg;                  // Message to print for this assertion
     struct TestAssertion* next; // Next _assertionitem in list
 } _assertionitem;
@@ -115,7 +116,7 @@ INITIALIZATION & DECONSTRUCTION
 
 // Assertion Item Initialization
 // Private method
-_assertionitem* _assertionitem_init(int status_code, char* msg)
+_assertionitem* _assertionitem_init(int status_code, char* msg, int line_num)
 {
     // NOTE THAT msg SHOULD ALWAYS BE A MALLOC'ED POINTER TO A STRING,
     // NEVER A STRING LITERAL. These should always originate from a call
@@ -130,6 +131,7 @@ _assertionitem* _assertionitem_init(int status_code, char* msg)
     _assertionitem* ass = (_assertionitem*)malloc(sizeof(_assertionitem));
 
     ass->status_code = status_code;
+    ass->line_num = line_num;
     ass->next = NULL;
 
     // Add message
@@ -238,6 +240,7 @@ void _assertionitem_print(_assertionitem* ass)
     if (ass == NULL)
         return;
 
+    printf("[%ld] ", ass->line_num);
     switch (ass->status_code)
     {
         case STATUS_CODE_PASS:
@@ -382,9 +385,9 @@ ASSERTION/TEST CASE MANAGEMENT
 
 // Shorthand to add an _assertionitem to a provided _caseitem
 // Private method
-void _caseitem_addAssertion(_caseitem* citem, int status_code, char* msg)
+void _caseitem_addAssertion(_caseitem* citem, int status_code, char* msg, int line_num)
 {
-    _assertionitem* new_ass = _assertionitem_init(status_code, msg);
+    _assertionitem* new_ass = _assertionitem_init(status_code, msg, line_num);
     if (citem->ass_head == NULL)
         citem->ass_head = new_ass;
     
@@ -441,7 +444,7 @@ int TestSuite_newCase(TestSuite* ts, char* case_name)
 
 // Call to indicate an assertion passed on the current running _caseitem
 // Public method
-int TestSuite_pass(TestSuite* ts, char* msg, ...)
+int TestSuite_pass(TestSuite* ts, long line_num, char* msg, ...)
 {
     if (ts->case_tail == NULL)
         return -1;
@@ -454,7 +457,7 @@ int TestSuite_pass(TestSuite* ts, char* msg, ...)
     pass_msg = format_string_valist(msg, arg_list);
 
     // Cases are added to the right side
-    _caseitem_addAssertion(ts->case_tail, STATUS_CODE_PASS, pass_msg);
+    _caseitem_addAssertion(ts->case_tail, STATUS_CODE_PASS, pass_msg, line_num);
     ts->case_tail->num_pass++;
     ts->case_tail->num_tests++;
 
@@ -464,7 +467,7 @@ int TestSuite_pass(TestSuite* ts, char* msg, ...)
 
 // Call to indicate an assertion failed on the current running _caseitem
 // Public method
-int TestSuite_fail(TestSuite* ts, char* msg, ...)
+int TestSuite_fail(TestSuite* ts, long line_num, char* msg, ...)
 {
     if (ts->case_tail == NULL)
         return -1;
@@ -477,7 +480,7 @@ int TestSuite_fail(TestSuite* ts, char* msg, ...)
     fail_msg = format_string_valist(msg, arg_list);
 
     // Cases are added to the right side
-    _caseitem_addAssertion(ts->case_tail, STATUS_CODE_FAIL, fail_msg);
+    _caseitem_addAssertion(ts->case_tail, STATUS_CODE_FAIL, fail_msg, line_num);
     ts->case_tail->num_fail++;
     ts->case_tail->num_tests++;
 
