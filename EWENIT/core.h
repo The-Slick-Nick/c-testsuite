@@ -360,6 +360,7 @@ void TestSuite_print(TestSuite* ts)
     printf("[%dP] [%dF] Total: %d", ts->total_pass, ts->total_fail, ts->total_tests);
     printf("\n\nTest Cases\n");
     printf("[%dP] [%dF] Total: %d", ts->cases_pass, ts->cases_fail, ts->num_cases);
+    printf("\n");
 
 }
 
