@@ -43,6 +43,10 @@ Version 0.8.0
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣧⣤⣾⣷⡤⠾⢟⢁⠀⠀⠀⠀
 
 ========================================================================================*/
+#ifndef INCLUDE_GUARD_EWENIT_MASTER
+#define INCLUDE_GUARD_EWENIT_MASTER
+
+
 #include "EWENIT.h"
 #include "extensions/extensions_master.h"
 
@@ -76,3 +80,6 @@ TestSuite* ts;
 #define ASSERT_ALMOST_EQUAL_DOUBLE(val1, val2)  ERROR_CHECK(assert_almost_equal_double(ts, val1, val2, __LINE__))
 #define ASSERT_NOT_ALMOST_EQUAL_DOUBLE(val1, val2) \
                                                 ERROR_CHECK(assert_not_almost_equal_double(ts, val1, val2, __LINE__))
+
+
+#endif
