@@ -39,7 +39,7 @@ int assert_greater_than_int(TestSuite* ts, int val1, int val2, long line_num)
 // Ensure value is true
 int assert_true(TestSuite* ts, int val1, long line_num)
 {
-    if (val)
+    if (val1)
         return TestSuite_pass(ts, line_num, "%d is true", val1);
     else
         return TestSuite_fail(ts, line_num, "%d is false", val1);
@@ -48,8 +48,8 @@ int assert_true(TestSuite* ts, int val1, long line_num)
 // Ensure value is false
 int assert_false(TestSuite* ts, int val1, long line_num)
 {
-    if (!val)
-        return TestSutie_pass(ts, line_num, "%d is false", val1);
+    if (!val1)
+        return TestSuite_pass(ts, line_num, "%d is false", val1);
     else
         return TestSuite_fail(ts, line_num, "%d is false", val1);
 }
