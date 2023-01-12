@@ -376,7 +376,7 @@ void TestSuite_printCompact(TestSuite* ts)
     PRINT_DOUBLE_LINE;
     printf("Assertions ");
     printf("[%dP] [%dF] Total: %d\n", ts->total_pass, ts->total_fail, ts->total_tests);
-    printf("Test Cases");
+    printf("Test Cases ");
     printf("[%dP] [%dF] Total: %d\n", ts->cases_pass, ts->cases_fail, ts->num_cases);
 }
 
