@@ -178,6 +178,7 @@ _caseitem* _caseitem_init(char* case_name)
     citem->ass_head = NULL;
     citem->ass_tail = NULL;
     citem->next = NULL;
+    return citem;
 }
 
 // Starting at head _caseitem, traverse all _caseitems and free any allocated memory
@@ -216,6 +217,8 @@ TestSuite* TestSuite_init()
 
     ts->case_head = NULL;
     ts->case_tail = NULL;
+
+    return ts;
 }
 
 // Public method
