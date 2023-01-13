@@ -7,7 +7,7 @@ Assertion functions revolving around doubleing point numbers
 #include <stdbool.h>
 #include <float.h>
 
-#define ALMOST_EQUAL_DOUBLE(val1, val2) abs(val1 - val2) < DBL_EPSILON
+#define ALMOST_EQUAL_DOUBLE(val1, val2) fabs(val1 - val2) < DBL_EPSILON
 
 
 // Compares two doubles for exact equality

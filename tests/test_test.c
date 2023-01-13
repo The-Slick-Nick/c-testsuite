@@ -48,6 +48,12 @@ void test_doubles()
     ASSERT_GREATER_THAN_DOUBLE(3.5f, 1.0f);
     ASSERT_GREATER_THAN_DOUBLE(3.5f, 3.5f);
     ASSERT_GREATER_THAN_DOUBLE(1.2f, 2.4f);
+
+    ASSERT_ALMOST_EQUAL_DOUBLE(0.5f, (double)4/8);  // PASS
+    ASSERT_ALMOST_EQUAL_DOUBLE(0.6f, (double)6/12); // FAIL
+
+    ASSERT_NOT_ALMOST_EQUAL_DOUBLE(0.5f, 0.428571f); // PASS
+    ASSERT_NOT_ALMOST_EQUAL_DOUBLE((double)12/20, (double)6/10); // FAIL
 }
 
 void test_extension()
@@ -78,9 +84,9 @@ void test_manual()
 // Using the test framework to test itself lol
 void meta_test()
 {
-    int expected_pass = 15;
-    int expected_fail = 19;
-    int expected_total = 34;
+    int expected_pass = 17;
+    int expected_fail = 21;
+    int expected_total = 38;
 
     if (OPTIONAL_VARIADIC_SUPPORTED)
     {
@@ -107,5 +113,4 @@ int main()
     ADD_CASE(meta_test, "META");
     EWENIT_END;
     // EWENIT_END_COMPACT;
-    
 }
