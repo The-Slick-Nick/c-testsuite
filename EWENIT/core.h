@@ -444,6 +444,7 @@ int TestSuite_newCase(TestSuite* ts, char* case_name)
 
     // new_case is now the "current" test case under consideration
     ts->case_tail = new_case;
+    return 0;
 }
 
 // Call to indicate an assertion passed on the current running _caseitem
