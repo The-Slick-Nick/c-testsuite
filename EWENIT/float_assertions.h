@@ -5,7 +5,7 @@ Assertion functions revolving around floating point numbers
 ========================================================================================*/
 #include <stdbool.h>
 #include <float.h>
-
+#include <math.h>
 #include "core.h"
 
 #define ALMOST_EQUAL_FLOAT(val1, val2) fabs(val1 - val2) < FLT_EPSILON
