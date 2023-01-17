@@ -19,8 +19,8 @@
                                                 TestSuite_deconstruct(ts);
 #define TEST_END_COMPACT                        EWENIT_END_COMPACT
 
-#define ADD_CASE(func, name)                    TestSuite_newCase(ts, name); func() 
-
+#define ADD_CASE(func)                          TestSuite_newCase(ts, #func); func()
+#define ADD_CASE_CUSTOM(func, name)             TestSuite_newCase(ts, name); func()
 
 // Allow manual PASS/FAIL macros to use formatted arguments if compiler supports it
 #if OPTIONAL_VARIADIC_SUPPORTED
