@@ -79,22 +79,34 @@ STRUCT DEFINITIONS
 // _assertionitem - individual assertion element - one per assertion per test case
 typedef struct TestAssertion {
     int status_code;            // Integer representing status of an assertion
+    char* file_name;            // File name assertion was called from
     int line_num;               // Row number assertion was called from
     char* msg;                  // Message to print for this assertion
-    struct TestAssertion* next; // Next _assertionitem in list
 } _assertionitem;
 
-// _caseitem - individual testcase element storing information about the case
 typedef struct TestCaseItem {
-    bool is_committed;          // Flag if this _caseitem has been recorded in TestSuite
-    int num_pass;               // Number successful assertions for this case
-    int num_fail;               // Number of unsuccessful assertions for this case
-    int num_tests;              // Total number of assertions for this test case
-    char* name;                 // Name provided for this test case
-    _assertionitem* ass_head;   // Pointer to head element of assertion list
-    _assertionitem* ass_tail;   // Pointer to tail element of assertion list
-    struct TestCaseItem* next;  // Pointer to next test case in list
+    bool is_committed;
+    int num_pass;
+    int num_fail;
+    int num_tests;
+    char* name;
+
+    size_t length;
+    size_t _size;
+    _assertionitem* assertions; // Now this is a dynamically allocated array
 } _caseitem;
+
+// _caseitem - individual testcase element storing information about the case
+// typedef struct TestCaseItem {
+//     bool is_committed;          // Flag if this _caseitem has been recorded in TestSuite
+//     int num_pass;               // Number successful assertions for this case
+//     int num_fail;               // Number of unsuccessful assertions for this case
+//     int num_tests;              // Total number of assertions for this test case
+//     char* name;                 // Name provided for this test case
+//     _assertionitem* ass_head;   // Pointer to head element of assertion list
+//     _assertionitem* ass_tail;   // Pointer to tail element of assertion list
+//     struct TestCaseItem* next;  // Pointer to next test case in list
+// } _caseitem;
 
 // TestSuite - head manager struct for tests
 typedef struct {
@@ -238,89 +250,105 @@ PRINT METHODS
 
 // Private method
 // Prints the error status and message for an individual assertion
-void _assertionitem_print(_assertionitem* ass)
-{
-    if (ass == NULL)
-        return;
+// void _assertionitem_print(_assertionitem* self)
+// {
 
-    printf("[%ld] ", ass->line_num);
-    switch (ass->status_code)
-    {
-        case STATUS_CODE_PASS:
-            printf("Success");
-            break;
-        case STATUS_CODE_FAIL:
-            printf("Fail");
-            break;
-        default:
-            break;
-    }
+//     printf("[%ld] ", self->line_num);
+//     switch (ass->status_code)
+//     {
+//         case STATUS_CODE_PASS:
+//             printf("Success");
+//             break;
+//         case STATUS_CODE_FAIL:
+//             printf("Fail");
+//             break;
+//         default:
+//             break;
+//     }
 
-    if (ass->msg == NULL)
-    {
-        printf("\n");
-        return;
-    }
-
-    printf(": %s\n", ass->msg);
-}
+//     if (self->msg == NULL)
+//     {
+//         printf("\n");
+//         return;
+//     }
+//     printf(": %s\n", self->msg);
+// }
 
 // Private method
 // Compact printing: Prints a one-line list of successes/failures of an assertionitem
 // i.e. PFFPFPPFF
-void _assertionitem_printCompact(_assertionitem* ass)
-{
-    if (ass == NULL)
-        return;
-
-    switch (ass->status_code)
-    {
-        case STATUS_CODE_PASS:
-            printf("P");
-            break;
-        case STATUS_CODE_FAIL:
-            printf("F");
-            break;
-        default:
-            break;
-    }
-}
+// void _assertionitem_printCompact(_assertionitem* self)
+// {
+//     switch (self->status_code)
+//     {
+//         case STATUS_CODE_PASS:
+//             printf("P");
+//             break;
+//         case STATUS_CODE_FAIL:
+//             printf("F");
+//             break;
+//         default:
+//             break;
+//     }
+// }
 
 // Private method
 // Prints a summary of success/failure for all assertions in a given test case
-void _caseitem_print(_caseitem* ci)
+void _caseitem_print(_caseitem* self)
 {
-    if (ci == NULL)
+
+    _assertionitem ass;
+
+    if (self == NULL)
         return;
 
-    if (ci->num_tests == 0)
+    if (self->num_tests == 0)
         return;
 
-    if (!ci->is_committed)
+    if (!self->is_committed)
         return;
 
     // Print name if one was given
-    if (ci->name == NULL)
-        printf("UNTITLED\n");
-    else
-        printf("%s\n", ci->name);
+    printf("%s\n", self->name);
 
-    // Print each assertion message for this test case
-    for (_assertionitem* cur = ci->ass_head; cur != NULL; cur = cur->next)
+    // NOTE: first need to sort self->assertions by (1) func name (2) line num
+    //  (for better organization/reference)
+
+    // Print all assertions for this test case
+    for (int i = 0; i < self->num_tests; i++)
     {
-        printf("    ");
-        _assertionitem_print(cur);
+        ass = *(self->assertions + i);
+        printf("[%ld] ", ass.line_num);
+        switch (ass.status_code)
+        {
+            case STATUS_CODE_PASS:
+                printf("Success");
+                break;
+            case STATUS_CODE_FAIL:
+                printf("Fail");
+                break;
+            default:
+                break;
+        }
+        if (ass.msg == NULL)
+        {
+            printf("\n");
+            return;
+        }
+        printf(": %s\n", ass.msg);
     }
+
     PRINT_SINGLE_LINE;
-    printf("[%dP] ", ci->num_pass);
-    printf("[%dF] ", ci->num_fail);
-    printf("Total: %d\n", ci->num_tests);
+    printf("[%dP] ", self->num_pass);
+    printf("[%dF] ", self->num_fail);
+    printf("Total: %d\n", self->num_tests);
 }
 
 // Private method
 // Compact printing of a case item. Prints a one-line summary of this test case
-void _caseitem_printCompact(_caseitem* ci)
+void _caseitem_printCompact(_caseitem* self)
 {
+    _assertionitem ass;
     if (ci == NULL)
         return;
 
@@ -342,9 +370,20 @@ void _caseitem_printCompact(_caseitem* ci)
         printf("Passed ");
 
     printf("[");
-    for (_assertionitem* cur = ci->ass_head; cur != NULL; cur = cur->next)
+    for (int i = 0; i < self->num_tests; i++)
     {
-        _assertionitem_printCompact(cur);
+        ass =  *(self->assertions + i);
+        switch (ass.status_code)
+        {
+            case STATUS_CODE_PASS:
+                printf("P");
+                break;
+            case STATUS_CODE_FAIL:
+                printf("F");
+                break;
+            default:
+                break;
+        }
     }
     printf("]");
 }
@@ -389,40 +428,55 @@ ASSERTION/TEST CASE MANAGEMENT
 
 // Shorthand to add an _assertionitem to a provided _caseitem
 // Private method
-void _caseitem_addAssertion(_caseitem* citem, int status_code, char* msg, int line_num)
+void _caseitem_resizeAssertions(_caseitem* self)
 {
-    _assertionitem* new_ass = _assertionitem_init(status_code, msg, line_num);
-    if (citem->ass_head == NULL)
-        citem->ass_head = new_ass;
-    
-    if (citem->ass_tail != NULL)
-        citem->ass_tail->next = new_ass;
+    while (self->length >= self->_size)
+    {
+        self->_size *= 2;
+    }
+    self->assertions = (_assertionitem*)realloc(self->_size * sizeof(_assertionitem));
+}
 
-    citem->ass_tail = new_ass;
+void _caseitem_addAssertion(
+    _caseitem* self, int status_code, char* msg, char* file_name, int line_num
+)
+{
+    if (self->length >= self->_size)
+        _caseitem_resizeAssertions(self);
+
+    _assertionitem* new_item = self->assertions + self->length;
+
+    new_item->status_code = statud_code;
+    new_item->msg = msg;
+    new_item->file_name = file_name;
+    new_item->line_num = line_num;
+
+    self->length++;
 }
 
 // A _caseitem is considered incomplete until it has been committed. This method commits
 // it, adding success/fail/total counts to TestSuite and flagging it as considered
 // Public method
-int TestSuite_commitCase(TestSuite* ts)
+int TestSuite_commitCase(TestSuite* self)
 {
-    if (ts->case_tail == NULL)
+
+    if (self->case_tail == NULL)
         return -1;
 
-    if (ts->case_tail->is_committed)
+    if (self->case_tail->is_committed)
         return -1;
 
-    ts->total_pass += ts->case_tail->num_pass;
-    ts->total_fail += ts->case_tail->num_fail;
-    ts->total_tests += ts->case_tail->num_tests;
+    self->total_pass += self->case_tail->num_pass;
+    self->total_fail += self->case_tail->num_fail;
+    self->total_tests += self->case_tail->num_tests;
 
-    ts->num_cases++;
-    if (ts->case_tail->num_fail > 0)
-        ts->cases_fail++;
+    self->num_cases++;
+    if (self->case_tail->num_fail > 0)
+        self->cases_fail++;
     else
-        ts->cases_pass++;
+        self->cases_pass++;
 
-    ts->case_tail->is_committed = true;
+    self->case_tail->is_committed = true;
     return 0;
 }
 
