@@ -178,6 +178,10 @@ _caseitem* _caseitem_init(char* case_name)
     citem->num_pass = 0;
     citem->num_fail = 0;
     citem->num_tests = 0;
+
+    citem->length = 0;
+    citem->_size = 4;
+    citem->assertions = (_assertionitem*)malloc(citem->size * sizeof(_assertionitem));
     
     if (case_name == NULL)
         citem->name = NULL;
@@ -187,9 +191,6 @@ _caseitem* _caseitem_init(char* case_name)
         strcpy(citem->name, case_name);
     }
 
-    citem->ass_head = NULL;
-    citem->ass_tail = NULL;
-    citem->next = NULL;
     return citem;
 }
 
