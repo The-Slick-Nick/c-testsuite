@@ -488,11 +488,11 @@ int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, .
 
 void TestSuite_resizeStrlib(TestSuite* self, size_t target_size)
 {
-    while (target_size >= self->strlib_size)
+    while (target_size > self->strlib_size)
     {
         self->strlib_size *= 2;
     }
-    self->strlib = (char*)realloc(self->strlib, self->strlib);
+    self->strlib = (char*)realloc(self->strlib, self->strlib_size * sizeof(char));
 }
 
 
