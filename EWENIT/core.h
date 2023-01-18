@@ -79,9 +79,9 @@ STRUCT DEFINITIONS
 // _assertionitem - individual assertion element - one per assertion per test case
 typedef struct TestAssertion {
     int status_code;            // Integer representing status of an assertion
-    char* file_name;            // File name assertion was called from
+    unsigned int file_name_offset;            // File name assertion was called from
     int line_num;               // Row number assertion was called from
-    char* msg;                  // Message to print for this assertion
+    unsigned int msg_offset;                  // Message to print for this assertion
 } _assertionitem;
 
 typedef struct TestCaseItem {
@@ -89,24 +89,13 @@ typedef struct TestCaseItem {
     int num_pass;
     int num_fail;
     int num_tests;
-    char* name;
+    unsigned int name_offset;   // Offset to strlib pointer containing name
 
     size_t length;
     size_t _size;
     _assertionitem* assertions; // Now this is a dynamically allocated array
 } _caseitem;
 
-// _caseitem - individual testcase element storing information about the case
-// typedef struct TestCaseItem {
-//     bool is_committed;          // Flag if this _caseitem has been recorded in TestSuite
-//     int num_pass;               // Number successful assertions for this case
-//     int num_fail;               // Number of unsuccessful assertions for this case
-//     int num_tests;              // Total number of assertions for this test case
-//     char* name;                 // Name provided for this test case
-//     _assertionitem* ass_head;   // Pointer to head element of assertion list
-//     _assertionitem* ass_tail;   // Pointer to tail element of assertion list
-//     struct TestCaseItem* next;  // Pointer to next test case in list
-// } _caseitem;
 
 // TestSuite - head manager struct for tests
 typedef struct {
@@ -117,8 +106,15 @@ typedef struct {
     int cases_pass;             // Number of test cases passed
     int cases_fail;             // Number of test cases failed
     int num_cases;              // Total number of _caseitem elements
-    _caseitem* case_head;       // Pointer to last _caseitem
-    _caseitem* case_tail;       // Pointer to last _caseitem in test cases
+
+    size_t strlib_length;   
+    size_t strlib_size;
+    char* strlib;      
+
+    size_t length;              // length of cases
+    size_t _size;                // Internal size of array allocated for cases
+    _caseitem* cases;           // Array of _caseitem elements
+
 } TestSuite;
 
 
@@ -126,172 +122,89 @@ typedef struct {
 INITIALIZATION & DECONSTRUCTION 
 ----------------------------------------------------------------------------------------*/
 
-// Assertion Item Initialization
-// Private method
-_assertionitem* _assertionitem_init(int status_code, char* msg, int line_num)
-{
-    // NOTE THAT msg SHOULD ALWAYS BE A MALLOC'ED POINTER TO A STRING,
-    // NEVER A STRING LITERAL. These should always originate from a call
-    // to format_string_valist.
-    // 
-    // Furthermore, this method should never be "publicly" called and should only
-    // ever originate from one of the two chains:
-    // TestSuite_pass -> _testcase_addAssertion -> _assertionitem_init (here)
-    // TestSuite_fail -> _testcase_addAssertion -> _assertionitem_init (here)
-
-
-    _assertionitem* ass = (_assertionitem*)malloc(sizeof(_assertionitem));
-
-    ass->status_code = status_code;
-    ass->line_num = line_num;
-    ass->next = NULL;
-
-    // Add message
-    ass->msg = msg;
-    return ass;
-}
-
-// Private method
-void _assertionitem_deconstruct(_assertionitem* ass)
-{
-    if (ass == NULL)
-        return;
-
-    _assertionitem* prev = NULL;
-    _assertionitem* current = ass;
-    while (current != NULL)
-    {
-        prev = current;
-        current = current->next;
-
-        free(prev->msg);
-        free(prev);
-    }
-}
-
-// Case Item
-// Private method
-_caseitem* _caseitem_init(char* case_name)
-{
-    _caseitem* citem = (_caseitem*)malloc(sizeof(_caseitem));
-    citem->is_committed = false;
-    citem->num_pass = 0;
-    citem->num_fail = 0;
-    citem->num_tests = 0;
-
-    citem->length = 0;
-    citem->_size = 4;
-    citem->assertions = (_assertionitem*)malloc(citem->size * sizeof(_assertionitem));
-    
-    if (case_name == NULL)
-        citem->name = NULL;
-    else
-    {
-        citem->name = (char*)malloc((1 + strlen(case_name)) * sizeof(char));
-        strcpy(citem->name, case_name);
-    }
-
-    return citem;
-}
-
 // Starting at head _caseitem, traverse all _caseitems and free any allocated memory
 // Private method
-void _caseitem_deconstruct(_caseitem* citem)
-{
-    if (citem == NULL)
-        return;
 
-    _caseitem* prev = NULL;
-    _caseitem* current = citem;
-    while (current != NULL)
-    {
-        prev = current;
-        current = current->next;
-
-        _assertionitem_deconstruct(prev->ass_head);
-        free(prev->name);
-        free(prev);
-    }
-
-}
 
 // TestSuite
 // Public method
 TestSuite* TestSuite_init()
 {
-    TestSuite* ts = (TestSuite*)malloc(sizeof(TestSuite));
-    ts->total_pass = 0;
-    ts->total_fail = 0;
-    ts->total_tests = 0;
+    TestSuite* self = (TestSuite*)malloc(sizeof(TestSuite));
+    self->total_pass = 0;
+    self->total_fail = 0;
+    self->total_tests = 0;
 
-    ts->cases_pass = 0;
-    ts->cases_fail = 0;
-    ts->num_cases = 0;
+    self->cases_pass = 0;
+    self->cases_fail = 0;
+    self->num_cases = 0;
 
-    ts->case_head = NULL;
-    ts->case_tail = NULL;
+    self->strlib_length = 0;
+    self->strlib_size = 4;
+    self->strlib = (char*)malloc(4 * sizeof(char));
 
-    return ts;
+    self->length = 0;
+    self->_size = 4;
+    self->cases = (_caseitem*)malloc(4 * sizeof(_caseitem));
+
+    return self;
+}
+
+void _caseitem_init(_caseitem* self, unsigned int name_offset)
+{
+    self->is_committed = false;
+    self->num_pass = 0;
+    self->num_fail = 0;
+    self->num_tests = 0;
+    self->name_offset = name_offset;
+
+    self->length = 0;
+    self->_size = 4;
+    self->assertions = (_assertionitem*)malloc(4 * sizeof(_assertionitem));
+}
+
+void _assertionitem_init(
+    _assertionitem* self, int status_code, unsigned int msg_offset,
+    unsigned int file_name_offset, int line_num
+)
+{
+    self->status_code = status_code;
+    self->msg_offset = msg_offset;
+    self->file_name_offset = file_name_offset;
+    self->line_num = line_num;
+
+}
+
+void _caseitem_deconstruct(_caseitem* self)
+{
+    if (self == NULL)
+        return;
+
+    // Only thing malloc'd for this
+    free(self->assertions);
+    free(self);
 }
 
 // Public method
-void TestSuite_deconstruct(TestSuite* ts)
+void TestSuite_deconstruct(TestSuite* self)
 {
-    if (ts == NULL)
+    if (self == NULL)
         return;
 
-    _caseitem_deconstruct(ts->case_head);
-    free(ts);
+    for (int i = 0; i < self->length; i++)
+    {
+        _caseitem_deconstruct(self->cases + i);
+    }
+
+    free(self->strlib);
+    free(self->cases);
+    free(self);
 }
 
 
 /*----------------------------------------------------------------------------------------
 PRINT METHODS
 ----------------------------------------------------------------------------------------*/
-
-// Private method
-// Prints the error status and message for an individual assertion
-// void _assertionitem_print(_assertionitem* self)
-// {
-
-//     printf("[%ld] ", self->line_num);
-//     switch (ass->status_code)
-//     {
-//         case STATUS_CODE_PASS:
-//             printf("Success");
-//             break;
-//         case STATUS_CODE_FAIL:
-//             printf("Fail");
-//             break;
-//         default:
-//             break;
-//     }
-
-//     if (self->msg == NULL)
-//     {
-//         printf("\n");
-//         return;
-//     }
-//     printf(": %s\n", self->msg);
-// }
-
-// Private method
-// Compact printing: Prints a one-line list of successes/failures of an assertionitem
-// i.e. PFFPFPPFF
-// void _assertionitem_printCompact(_assertionitem* self)
-// {
-//     switch (self->status_code)
-//     {
-//         case STATUS_CODE_PASS:
-//             printf("P");
-//             break;
-//         case STATUS_CODE_FAIL:
-//             printf("F");
-//             break;
-//         default:
-//             break;
-//     }
-// }
 
 // Private method
 // Prints a summary of success/failure for all assertions in a given test case
@@ -435,24 +348,33 @@ void _caseitem_resizeAssertions(_caseitem* self)
     {
         self->_size *= 2;
     }
-    self->assertions = (_assertionitem*)realloc(self->_size * sizeof(_assertionitem));
+    self->assertions = (_assertionitem*)realloc(
+        self->assertions, self->_size * sizeof(_assertionitem)
+    );
 }
 
 void _caseitem_addAssertion(
-    _caseitem* self, int status_code, char* msg, char* file_name, int line_num
+    _caseitem* self, int status_code, unsigned int msg_offset,
+    unsigned int file_name_offset, int line_num
 )
 {
     if (self->length >= self->_size)
         _caseitem_resizeAssertions(self);
 
-    _assertionitem* new_item = self->assertions + self->length;
-
-    new_item->status_code = statud_code;
-    new_item->msg = msg;
-    new_item->file_name = file_name;
-    new_item->line_num = line_num;
-
+    _assertionitem_init(
+        self->assertions + self->length, status_code, msg_offset, file_name_offset,
+        line_num
+    );
     self->length++;
+}
+
+void TestSuite_resizeCases(TestSuite* self)
+{
+    while (self->length >= self->_size)
+    {
+        self->_size *= 2;
+    }
+    self->cases = (_caseitem*)realloc(self->cases, self->_size * sizeof(_caseitem));
 }
 
 // A _caseitem is considered incomplete until it has been committed. This method commits
@@ -460,66 +382,74 @@ void _caseitem_addAssertion(
 // Public method
 int TestSuite_commitCase(TestSuite* self)
 {
-
-    if (self->case_tail == NULL)
+    if (self->length == 0)
         return -1;
 
-    if (self->case_tail->is_committed)
+    _caseitem* current = (self->cases + self->length - 1);
+
+    if (current->is_committed)
         return -1;
 
-    self->total_pass += self->case_tail->num_pass;
-    self->total_fail += self->case_tail->num_fail;
-    self->total_tests += self->case_tail->num_tests;
+    self->total_pass += current->num_pass;
+    self->total_fail += current->num_fail;
+    self->total_tests += current->num_tests;
 
     self->num_cases++;
-    if (self->case_tail->num_fail > 0)
+
+    // Determine if the case as a whole succeeded or failed
+    if (current->num_fail > 0)
         self->cases_fail++;
     else
         self->cases_pass++;
 
-    self->case_tail->is_committed = true;
+    current->is_committed = true;
     return 0;
 }
 
 // Adds a new test case. First commits the old running one at tail _caseitem, then
 // appends a brand new one to the right side
 // Public method
-int TestSuite_newCase(TestSuite* ts, char* case_name)
+int TestSuite_newCase(TestSuite* self, char* case_name)
 {
     // New case - commit the old one
-    TestSuite_commitCase(ts);
+    TestSuite_commitCase(self);
 
-    _caseitem* new_case = _caseitem_init(case_name);
+    unsigned int case_name_offset = TestSuite_addString(self, case_name);
 
-    if (ts->case_head == NULL)
-        ts->case_head = new_case;
+    if (self->length >= self->_size)
+        TestSuite_resizeCases(self);
 
-    if (ts->case_tail != NULL)
-        ts->case_tail->next = new_case;
+    _caseitem_init(self->cases + self->length, case_name_offset);
+    self->length++;
 
-    // new_case is now the "current" test case under consideration
-    ts->case_tail = new_case;
     return 0;
 }
 
 // Call to indicate an assertion passed on the current running _caseitem
 // Public method
-int TestSuite_pass(TestSuite* ts, long line_num, char* msg, ...)
+int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, ...)
 {
-    if (ts->case_tail == NULL)
+    if (self->length == 0)
         return -1;
 
-    // Handle any formatting passed by using format_string_valist
-    char* pass_msg;
     va_list arg_list;
+    unsigned int msg_offset;
+    unsigned int file_name_offset;
+    _caseitem* current_case;
+
     va_start(arg_list, msg);
 
-    pass_msg = format_string_valist(msg, arg_list);
+    msg_offset = TestSuite_vaddString(self, msg, arg_list);
+    file_name_offset = TestSuite_vaddString(self, file_name, arg_list);
 
-    // Cases are added to the right side
-    _caseitem_addAssertion(ts->case_tail, STATUS_CODE_PASS, pass_msg, line_num);
-    ts->case_tail->num_pass++;
-    ts->case_tail->num_tests++;
+    current_case = (self->cases + self->length - 1);
+
+    _caseitem_addAssertion(
+        current_case, STATUS_CODE_PASS, msg_offset, file_name_offset, line_num 
+    );
+
+    current_case->num_pass++;
+    current_case->num_tests++;
 
     va_end(arg_list);
     return 0;
@@ -527,25 +457,71 @@ int TestSuite_pass(TestSuite* ts, long line_num, char* msg, ...)
 
 // Call to indicate an assertion failed on the current running _caseitem
 // Public method
-int TestSuite_fail(TestSuite* ts, long line_num, char* msg, ...)
+int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, ...)
 {
-    if (ts->case_tail == NULL)
+    if (self->length == 0)
         return -1;
 
-    // Handle any formatting passed by using format_string_valist
-    char* fail_msg;
     va_list arg_list;
+    unsigned int msg_offset;
+    unsigned int file_name_offset;
+    _caseitem* current_case;
+
     va_start(arg_list, msg);
 
-    fail_msg = format_string_valist(msg, arg_list);
+    msg_offset = TestSuite_vaddString(self, msg, arg_list);
+    file_name_offset = TestSuite_vaddString(self, file_name, arg_list);
 
-    // Cases are added to the right side
-    _caseitem_addAssertion(ts->case_tail, STATUS_CODE_FAIL, fail_msg, line_num);
-    ts->case_tail->num_fail++;
-    ts->case_tail->num_tests++;
+    current_case = (self->cases + self->length - 1);
+
+    _caseitem_addAssertion(
+        current_case, STATUS_CODE_FAIL, msg_offset, file_name_offset, line_num 
+    );
+
+    current_case->num_fail++;
+    current_case->num_tests++;
 
     va_end(arg_list);
     return 0;
+}
+
+
+void TestSuite_resizeStrlib(TestSuite* self, size_t target_size)
+{
+    while (target_size >= self->strlib_size)
+    {
+        self->strlib_size *= 2;
+    }
+    self->strlib = (char*)realloc(self->strlib, self->strlib);
+}
+
+
+// Add a string to TestSuite's string library
+// Returns offset to strlib pointer that string is found at
+unsigned int TestSuite_vaddString(TestSuite* self, char* new_str, va_list arg_list)
+{
+    size_t num_new_chars;
+    unsigned int start_length = self->length;
+
+    // First identify how many extra characters will need added
+    num_new_chars = vsnprintf(NULL, 0, new_str, arg_list);
+
+    // Resize our library if needed
+    TestSuite_resizeStrlib(self, num_new_chars + self->length);
+    vnsnprintf(self->strlib + self->length, num_new_chars, new_str, arg_list);
+    self->length += num_new_chars;
+    return start_length;
+}
+
+unsigned int TestSuite_addString(TestSuite* self, char* new_str, ...)
+{
+    va_list arg_list;
+    int return_offset;
+
+    va_start(arg_list, new_str);
+    return_offset = TestSuite_vaddString(self, new_str, arg_list);
+    va_end(arg_list);
+    return return_offset;
 }
 
 #endif
