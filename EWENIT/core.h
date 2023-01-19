@@ -182,7 +182,6 @@ void _caseitem_deconstruct(_caseitem* self)
 
     // Only thing malloc'd for this
     free(self->assertions);
-    free(self);
 }
 
 // Public method
@@ -193,12 +192,55 @@ void TestSuite_deconstruct(TestSuite* self)
 
     for (int i = 0; i < self->length; i++)
     {
-        _caseitem_deconstruct(self->cases + i);
+        _caseitem_deconstruct((_caseitem*)(self->cases + i));
     }
 
     free(self->strlib);
     free(self->cases);
     free(self);
+}
+
+void TestSuite_resizeStrlib(TestSuite* self, size_t target_size)
+{
+
+    while (target_size > self->strlib_size)
+    {
+        self->strlib_size *= 2;
+    }
+    self->strlib = (char*)realloc(self->strlib, self->strlib_size * sizeof(char));
+}
+
+
+// Add a string to TestSuite's string library
+// Returns offset to strlib pointer that string is found at
+unsigned int TestSuite_vaddString(TestSuite* self, char* new_str, va_list arg_list)
+{
+    size_t num_new_chars;
+    size_t target_size;
+    unsigned int start_length = self->strlib_length;
+
+    // First identify how many extra characters will need added
+    num_new_chars = vsnprintf(NULL, 0, new_str, arg_list) + 1;
+
+    // Resize our library if needed
+    target_size = num_new_chars + self->strlib_length;
+    if (target_size > self->strlib_size)
+        TestSuite_resizeStrlib(self, target_size);
+
+    vsnprintf((char*)(self->strlib + self->strlib_length), num_new_chars, new_str, arg_list);
+    self->strlib_length += num_new_chars;
+    return start_length;
+}
+
+unsigned int TestSuite_addString(TestSuite* self, char* new_str, ...)
+{
+    va_list arg_list;
+    int return_offset;
+
+    va_start(arg_list, new_str);
+    return_offset = TestSuite_vaddString(self, new_str, arg_list);
+    va_end(arg_list);
+    return return_offset;
 }
 
 
@@ -216,12 +258,12 @@ void _caseitem_print(_caseitem* self, char* strlib)
     _assertionitem* ass;
 
     // Pointer to name of case
-    case_name = strlib + self->name_offset;
+    case_name = (char*)(strlib + self->name_offset);
     printf("%s\n", case_name);
 
     for (int i = 0; i < self->length; i++)
     {
-        ass = self->length + i;
+        ass = (_assertionitem*)(self->assertions + i - 1);
         // Regular print - don't report on successes
         if (ass->status_code != STATUS_CODE_FAIL)
             continue;
@@ -287,7 +329,7 @@ void _caseitem_printVerbose(_caseitem* self, char* strlib)
 
     for (int i = 0; i < self->length; i++)
     {
-        ass = self->length + i;
+        ass = (_assertionitem*)(self->length + i);
         // Regular print - don't report on successes
         switch (ass->status_code)
         {
@@ -318,7 +360,7 @@ void TestSuite_print(TestSuite* self)
 
     for (int i = 0; i < self->length; i++)
     {
-        current_case = (self->cases + i);
+        current_case = (_caseitem*)(self->cases + i);
         if (current_case->num_fail == 0)
             continue;
         _caseitem_print(self->cases + i, self->strlib);
@@ -326,9 +368,9 @@ void TestSuite_print(TestSuite* self)
 
     PRINT_DOUBLE_LINE;
     printf("Assertions\n");
-    printf("[%dP] [%dF] Total: %d", ts->total_pass, ts->total_fail, ts->total_tests);
+    printf("[%dP] [%dF] Total: %d", self->total_pass, self->total_fail, self->total_tests);
     printf("\n\nTest Cases\n");
-    printf("[%dP] [%dF] Total: %d", ts->cases_pass, ts->cases_fail, ts->num_cases);
+    printf("[%dP] [%dF] Total: %d", self->cases_pass, self->cases_fail, self->num_cases);
     printf("\n");
 
 }
@@ -345,9 +387,9 @@ void TestSuite_printCompact(TestSuite* self)
 
     PRINT_DOUBLE_LINE;
     printf("Assertions ");
-    printf("[%dP] [%dF] Total: %d\n", ts->total_pass, ts->total_fail, ts->total_tests);
+    printf("[%dP] [%dF] Total: %d\n", self->total_pass, self->total_fail, self->total_tests);
     printf("Test Cases ");
-    printf("[%dP] [%dF] Total: %d\n", ts->cases_pass, ts->cases_fail, ts->num_cases);
+    printf("[%dP] [%dF] Total: %d\n", self->cases_pass, self->cases_fail, self->num_cases);
 }
 
 void TestSuite_printVerbose(TestSuite* self)
@@ -362,9 +404,9 @@ void TestSuite_printVerbose(TestSuite* self)
 
     PRINT_DOUBLE_LINE;
     printf("Assertions\n");
-    printf("[%dP] [%dF] Total: %d", ts->total_pass, ts->total_fail, ts->total_tests);
+    printf("[%dP] [%dF] Total: %d", self->total_pass, self->total_fail, self->total_tests);
     printf("\n\nTest Cases\n");
-    printf("[%dP] [%dF] Total: %d", ts->cases_pass, ts->cases_fail, ts->num_cases);
+    printf("[%dP] [%dF] Total: %d", self->cases_pass, self->cases_fail, self->num_cases);
     printf("\n");
 }
 /*----------------------------------------------------------------------------------------
@@ -392,8 +434,8 @@ void _caseitem_addAssertion(
         _caseitem_resizeAssertions(self);
 
     _assertionitem_init(
-        self->assertions + self->length, status_code, msg_offset, file_name_offset,
-        line_num
+        (_assertionitem*)(self->assertions + self->length), status_code, msg_offset,
+        file_name_offset, line_num
     );
     self->length++;
 }
@@ -415,7 +457,7 @@ int TestSuite_commitCase(TestSuite* self)
     if (self->length == 0)
         return -1;
 
-    _caseitem* current = (self->cases + self->length - 1);
+    _caseitem* current = (_caseitem*)(self->cases + self->length - 1);
 
     if (current->is_committed)
         return -1;
@@ -450,7 +492,7 @@ int TestSuite_newCase(TestSuite* self, char* case_name)
     if (self->length >= self->_size)
         TestSuite_resizeCases(self);
 
-    _caseitem_init(self->cases + self->length, case_name_offset);
+    _caseitem_init((_caseitem*)(self->cases + self->length), case_name_offset);
     self->length++;
 
     return 0;
@@ -473,7 +515,7 @@ int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, .
     msg_offset = TestSuite_vaddString(self, msg, arg_list);
     file_name_offset = TestSuite_vaddString(self, file_name, arg_list);
 
-    current_case = (self->cases + self->length - 1);
+    current_case = (_caseitem*)(self->cases + self->length - 1);
     _caseitem_addAssertion(
         current_case, STATUS_CODE_PASS, msg_offset, file_name_offset, line_num 
     );
@@ -502,7 +544,7 @@ int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, .
     msg_offset = TestSuite_vaddString(self, msg, arg_list);
     file_name_offset = TestSuite_vaddString(self, file_name, arg_list);
 
-    current_case = (self->cases + self->length - 1);
+    current_case = (_caseitem*)(self->cases + self->length - 1);
 
     _caseitem_addAssertion(
         current_case, STATUS_CODE_FAIL, msg_offset, file_name_offset, line_num 
@@ -516,42 +558,7 @@ int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, .
 }
 
 
-void TestSuite_resizeStrlib(TestSuite* self, size_t target_size)
-{
-    while (target_size > self->strlib_size)
-    {
-        self->strlib_size *= 2;
-    }
-    self->strlib = (char*)realloc(self->strlib, self->strlib_size * sizeof(char));
-}
 
 
-// Add a string to TestSuite's string library
-// Returns offset to strlib pointer that string is found at
-unsigned int TestSuite_vaddString(TestSuite* self, char* new_str, va_list arg_list)
-{
-    size_t num_new_chars;
-    unsigned int start_length = self->length;
-
-    // First identify how many extra characters will need added
-    num_new_chars = vsnprintf(NULL, 0, new_str, arg_list);
-
-    // Resize our library if needed
-    TestSuite_resizeStrlib(self, num_new_chars + self->length);
-    vnsnprintf(self->strlib + self->length, num_new_chars, new_str, arg_list);
-    self->length += num_new_chars;
-    return start_length;
-}
-
-unsigned int TestSuite_addString(TestSuite* self, char* new_str, ...)
-{
-    va_list arg_list;
-    int return_offset;
-
-    va_start(arg_list, new_str);
-    return_offset = TestSuite_vaddString(self, new_str, arg_list);
-    va_end(arg_list);
-    return return_offset;
-}
 
 #endif

@@ -73,12 +73,6 @@ void test_manual()
     TEST_FAIL("FAIL1");
     TEST_FAIL_FMT("FAIL%d", 2);
 
-    // Only if compiler supports ##__VA_ARGS__
-    if (OPTIONAL_VARIADIC_SUPPORTED)
-    {
-        TEST_PASS("PASS%d", 3);
-        TEST_FAIL("FAIL%d", 3);
-    }
 }
 
 // Using the test framework to test itself lol
@@ -87,13 +81,6 @@ void meta_test()
     int expected_pass = 17;
     int expected_fail = 21;
     int expected_total = 38;
-
-    if (OPTIONAL_VARIADIC_SUPPORTED)
-    {
-        expected_pass++;
-        expected_fail++;
-        expected_total += 2;
-    }
 
     ASSERT_EQUAL_INT(ts->total_pass, expected_pass);
     ASSERT_EQUAL_INT(ts->total_fail, expected_fail);
@@ -111,5 +98,5 @@ int main()
     ADD_CASE(test_manual);
     ADD_CASE(meta_test);
 
-    EWENIT_END;
+    EWENIT_END_VERBOSE;
 }

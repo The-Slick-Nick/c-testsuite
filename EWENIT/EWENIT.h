@@ -19,21 +19,26 @@
                                                 TestSuite_deconstruct(ts);
 #define TEST_END_COMPACT                        EWENIT_END_COMPACT
 
+#define EWENIT_END_VERBOSE                      TestSuite_commitCase(ts);\
+                                                TestSuite_printVerbose(ts);\
+                                                TestSuite_deconstruct(ts);
+#define TEST_END_VERBOSE                        EWENIT_END_VERBOSE
+
 #define ADD_CASE(func)                          TestSuite_newCase(ts, #func); func()
 #define ADD_CASE_CUSTOM(func, name)             TestSuite_newCase(ts, name); func()
 
 // Allow manual PASS/FAIL macros to use formatted arguments if compiler supports it
 #if OPTIONAL_VARIADIC_SUPPORTED
-    #define TEST_PASS(msg, ...)                 TestSuite_pass(ts, __LINE__, msg, ##__VA_ARGS__)
-    #define TEST_FAIL(msg, ...)                 TestSuite_fail(ts, __LINE__, msg, ##__VA_ARGS__)
+    #define TEST_PASS(msg, ...)                 TestSuite_pass(ts, __FILE__, __LINE__, msg, ##__VA_ARGS__)
+    #define TEST_FAIL(msg, ...)                 TestSuite_fail(ts, __FILE__, __LINE__, msg, ##__VA_ARGS__)
 #else
-    #define TEST_PASS(msg)                      TestSuite_pass(ts, __LINE__, msg)
-    #define TEST_FAIL(msg)                      TestSuite_fail(ts, __LINE__, msg)
+    #define TEST_PASS(msg)                      TestSuite_pass(ts, __FILE__, __LINE__, msg)
+    #define TEST_FAIL(msg)                      TestSuite_fail(ts, __FILE__, __LINE__, msg)
 #endif
 
 // Provide a formatting-supported version of the macro regardless
-#define TEST_PASS_FMT(msg, ...)                 TestSuite_pass(ts, __LINE__, msg, __VA_ARGS__)
-#define TEST_FAIL_FMT(msg, ...)                 TestSuite_fail(ts, __LINE__, msg, __VA_ARGS__)
+#define TEST_PASS_FMT(msg, ...)                 TestSuite_pass(ts, __FILE__, __LINE__, msg, __VA_ARGS__)
+#define TEST_FAIL_FMT(msg, ...)                 TestSuite_fail(ts, __FILE__, __LINE__, msg, __VA_ARGS__)
 
 
 #define ERROR_CHECK(x)                          if (x < 0) do \
