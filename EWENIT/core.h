@@ -30,51 +30,12 @@ and should probably never be directly called outside of this file.
 
 #define PRINT_SINGLE_LINE   printf("------------------------------\n")
 #define PRINT_DOUBLE_LINE   printf("==============================\n")
-
-
-/*----------------------------------------------------------------------------------------
-HELPER METHOD DEFINITIONS
-----------------------------------------------------------------------------------------*/
-
-// Uses a double-call to vnsprintf and parsing of a va_list to generate and return
-// a pointer to a formatted variable length message. If no variable args are provided,
-// simply allocates a new char array ptr, copies base_str into it, then returns it
-// Used primarily for generating error messages and making copies
-char* format_string(char* base_str, ...)
-{
-    va_list arg_list;
-    va_start(arg_list, base_str);
-
-    // Passing NULL as destination to vsnprintf will return length of target
-    // resulting string
-    int length = 1 + vsnprintf(NULL, 0, base_str, arg_list);
-    char* to_return = (char*)malloc(length * sizeof(char));
-
-    // Now that length is known, make second call to vsnprintf to generate desired
-    // string
-    vsnprintf(to_return, length, base_str, arg_list);
-    
-    // I'm not sure why but we need to va_end if we have used va_start
-    va_end(arg_list);
-    return to_return;
-}
-
-// Format string as above with an already-parsed va_list given
-// Returns a newly-allocated character array pointer
-char* format_string_valist(char* base_str, va_list arg_list)
-{
-    int length = 1 + vsnprintf(NULL, 0, base_str, arg_list);
-    char* to_return = (char*)malloc(length * sizeof(char));
-
-    vsnprintf(to_return, length, base_str, arg_list);
-    return to_return;
-}
+#define PRINT_UNDER_LINE    printf("______________________________\n")
 
 
 /*----------------------------------------------------------------------------------------
 STRUCT DEFINITIONS
 ----------------------------------------------------------------------------------------*/
-
 
 // _assertionitem - individual assertion element - one per assertion per test case
 typedef struct TestAssertion {
@@ -119,15 +80,10 @@ typedef struct {
 
 
 /*----------------------------------------------------------------------------------------
-INITIALIZATION & DECONSTRUCTION 
+INITIALIZATION
 ----------------------------------------------------------------------------------------*/
 
-// Starting at head _caseitem, traverse all _caseitems and free any allocated memory
-// Private method
-
-
-// TestSuite
-// Public method
+// TestSuite initialization - heap allocation, returns pointers
 TestSuite* TestSuite_init()
 {
     TestSuite* self = (TestSuite*)malloc(sizeof(TestSuite));
@@ -150,6 +106,7 @@ TestSuite* TestSuite_init()
     return self;
 }
 
+// Initializes an already allocated _caseitem
 void _caseitem_init(_caseitem* self, unsigned int name_offset)
 {
     self->is_committed = false;
@@ -163,6 +120,7 @@ void _caseitem_init(_caseitem* self, unsigned int name_offset)
     self->assertions = (_assertionitem*)malloc(4 * sizeof(_assertionitem));
 }
 
+// Initializes an already allocated _assertionitem
 void _assertionitem_init(
     _assertionitem* self, int status_code, unsigned int msg_offset,
     unsigned int file_name_offset, int line_num
@@ -174,6 +132,10 @@ void _assertionitem_init(
     self->line_num = line_num;
 
 }
+
+/*----------------------------------------------------------------------------------------
+DECONSTRUCTION
+----------------------------------------------------------------------------------------*/
 
 void _caseitem_deconstruct(_caseitem* self)
 {
@@ -200,6 +162,12 @@ void TestSuite_deconstruct(TestSuite* self)
     free(self);
 }
 
+/*----------------------------------------------------------------------------------------
+HANDLING STRLIB
+----------------------------------------------------------------------------------------*/
+
+// Resizes internal character memory allocation block until large enough to accomodate
+// target_size
 void TestSuite_resizeStrlib(TestSuite* self, size_t target_size)
 {
 
@@ -211,8 +179,7 @@ void TestSuite_resizeStrlib(TestSuite* self, size_t target_size)
 }
 
 
-// Add a string to TestSuite's string library
-// Returns offset to strlib pointer that string is found at
+// var arg version of TestSuite_addString
 unsigned int TestSuite_vaddString(TestSuite* self, char* new_str, va_list arg_list)
 {
     size_t num_new_chars;
@@ -232,6 +199,8 @@ unsigned int TestSuite_vaddString(TestSuite* self, char* new_str, va_list arg_li
     return start_length;
 }
 
+// Add a string to TestSuite's string library
+// Returns offset to strlib pointer where string is now located
 unsigned int TestSuite_addString(TestSuite* self, char* new_str, ...)
 {
     va_list arg_list;
@@ -255,10 +224,14 @@ void _caseitem_print(_caseitem* self, char* strlib)
         return;
 
     char* case_name;
+    char* file_name;
+    char* last_file_name = "";
     _assertionitem* ass;
 
     // Pointer to name of case
     case_name = (char*)(strlib + self->name_offset);
+
+    PRINT_DOUBLE_LINE;
     printf("%s\n", case_name);
 
     for (int i = 0; i < self->length; i++)
@@ -268,7 +241,13 @@ void _caseitem_print(_caseitem* self, char* strlib)
         if (ass->status_code != STATUS_CODE_FAIL)
             continue;
 
-        printf("[%ld] ", ass->line_num);
+        file_name = (char*)(strlib + ass->file_name_offset);
+        if (strcmp(file_name, last_file_name) != 0)
+            printf("    %s\n", file_name);
+        
+        last_file_name = file_name;
+
+        printf("    [%ld] ", ass->line_num);
         printf("Fail");
         printf(": %s\n", (strlib + ass->msg_offset));
     }   
@@ -322,14 +301,24 @@ void _caseitem_printVerbose(_caseitem* self, char* strlib)
         return;
 
     char* case_name;
+    char* file_name;
+    char* last_file_name = "";
     _assertionitem* ass;
 
-    // Print name of test case at header
+
+    PRINT_DOUBLE_LINE;
     printf("%s\n", strlib + self->name_offset);
 
     for (int i = 0; i < self->length; i++)
     {
-        ass = (_assertionitem*)(self->length + i);
+        ass = (_assertionitem*)(self->assertions + i);
+
+        file_name = (char*)(strlib + ass->file_name_offset);
+        if (strcmp(file_name, last_file_name) != 0)
+            printf("    %s\n", file_name);
+
+        last_file_name = file_name;
+        printf("    [%ld] ", ass->line_num);
         // Regular print - don't report on successes
         switch (ass->status_code)
         {
@@ -340,9 +329,6 @@ void _caseitem_printVerbose(_caseitem* self, char* strlib)
                 printf("Fail");
                 break;
         }
-
-        printf("[%ld] ", ass->line_num);
-        printf("Fail");
         printf(": %s\n", (strlib + ass->msg_offset));
     }   
 
@@ -357,12 +343,13 @@ void TestSuite_print(TestSuite* self)
 {
 
     _caseitem* current_case;
-
+    
     for (int i = 0; i < self->length; i++)
     {
         current_case = (_caseitem*)(self->cases + i);
         if (current_case->num_fail == 0)
             continue;
+
         _caseitem_print(self->cases + i, self->strlib);
     }
 
@@ -372,6 +359,7 @@ void TestSuite_print(TestSuite* self)
     printf("\n\nTest Cases\n");
     printf("[%dP] [%dF] Total: %d", self->cases_pass, self->cases_fail, self->num_cases);
     printf("\n");
+    PRINT_UNDER_LINE;
 
 }
 
@@ -398,8 +386,8 @@ void TestSuite_printVerbose(TestSuite* self)
 
     for (int i = 0; i < self->length; i++)
     {
-        current_case = (self->cases + i);
-        _caseitem_print(self->cases + i, self->strlib);
+        current_case = (_caseitem*)(self->cases + i);
+        _caseitem_printVerbose(current_case, self->strlib);
     }
 
     PRINT_DOUBLE_LINE;
@@ -409,6 +397,8 @@ void TestSuite_printVerbose(TestSuite* self)
     printf("[%dP] [%dF] Total: %d", self->cases_pass, self->cases_fail, self->num_cases);
     printf("\n");
 }
+
+
 /*----------------------------------------------------------------------------------------
 ASSERTION/TEST CASE MANAGEMENT
 ----------------------------------------------------------------------------------------*/
@@ -425,6 +415,7 @@ void _caseitem_resizeAssertions(_caseitem* self)
     );
 }
 
+// Addes a new assertion to a provided _caseitem pointer
 void _caseitem_addAssertion(
     _caseitem* self, int status_code, unsigned int msg_offset,
     unsigned int file_name_offset, int line_num
@@ -440,6 +431,7 @@ void _caseitem_addAssertion(
     self->length++;
 }
 
+// Resize a TestSuite's internal case storage array to fit more elements
 void TestSuite_resizeCases(TestSuite* self)
 {
     while (self->length >= self->_size)
@@ -451,7 +443,6 @@ void TestSuite_resizeCases(TestSuite* self)
 
 // A _caseitem is considered incomplete until it has been committed. This method commits
 // it, adding success/fail/total counts to TestSuite and flagging it as considered
-// Public method
 int TestSuite_commitCase(TestSuite* self)
 {
     if (self->length == 0)
@@ -480,7 +471,6 @@ int TestSuite_commitCase(TestSuite* self)
 
 // Adds a new test case. First commits the old running one at tail _caseitem, then
 // appends a brand new one to the right side
-// Public method
 int TestSuite_newCase(TestSuite* self, char* case_name)
 {
     // New case - commit the old one
