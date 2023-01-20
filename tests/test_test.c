@@ -103,14 +103,13 @@ void meta_test()
 int main()
 {
     EWENIT_START;
-    ADD_CASE(test_integers, "INTEGERS");
-    ADD_CASE(test_strings, "STRINGS");
-    ADD_CASE(test_floats, "FLOATS");
-    ADD_CASE(test_doubles, "DOUBLES");
-    ADD_CASE(test_extension, "EXTENSION");
-    ADD_CASE(test_manual, "MANUAL");
+    ADD_CASE(test_integers);
+    ADD_CASE(test_strings);
+    ADD_CASE(test_floats);
+    ADD_CASE(test_doubles);
+    ADD_CASE(test_extension);
+    ADD_CASE(test_manual);
+    ADD_CASE(meta_test);
 
-    ADD_CASE(meta_test, "META");
     EWENIT_END;
-    // EWENIT_END_COMPACT;
 }
