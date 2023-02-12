@@ -220,7 +220,7 @@ PRINT METHODS
 // Print summary of current case. Full output, but excludes successes
 void _caseitem_print(_caseitem* self, char* strlib)
 {
-    if (self->num_tests == 0 | !self->is_committed)
+    if (self->num_tests == 0 || !self->is_committed)
         return;
 
     char* case_name;
@@ -247,7 +247,7 @@ void _caseitem_print(_caseitem* self, char* strlib)
         
         last_file_name = file_name;
 
-        printf("    [%ld] ", ass->line_num);
+        printf("    [%d] ", ass->line_num);
         printf("Fail");
         printf(": %s\n", (strlib + ass->msg_offset));
     }   
@@ -297,10 +297,8 @@ void _caseitem_printCompact(_caseitem* self, char* strlib)
 // Prints full test case report, including successes
 void _caseitem_printVerbose(_caseitem* self, char* strlib)
 {
-    if (self->num_tests == 0 | !self->is_committed)
+    if (self->num_tests == 0 || !self->is_committed)
         return;
-
-    char* case_name;
     char* file_name;
     char* last_file_name = "";
     _assertionitem* ass;
@@ -318,7 +316,7 @@ void _caseitem_printVerbose(_caseitem* self, char* strlib)
             printf("    %s\n", file_name);
 
         last_file_name = file_name;
-        printf("    [%ld] ", ass->line_num);
+        printf("    [%d] ", ass->line_num);
         // Regular print - don't report on successes
         switch (ass->status_code)
         {
