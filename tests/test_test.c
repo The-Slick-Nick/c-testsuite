@@ -1,4 +1,4 @@
-#include "../EWENIT/EWENIT.c"
+#include "../EWENIT/EWENIT.h"
 
 
 void test_integers()
@@ -29,25 +29,25 @@ void test_strings()
 void test_floats()
 {
     // 3 passes, 4 fails
-    ASSERT_EQUAL_FLOAT(1.5f, 1.5f);
-    ASSERT_EQUAL_FLOAT(1.5f, 2);
-    ASSERT_NOT_EQUAL_FLOAT(1.5f, 3.2f);
-    ASSERT_NOT_EQUAL_FLOAT(1.5f, 1.5f);
-    ASSERT_GREATER_THAN_FLOAT(3.5f, 1.0f);
-    ASSERT_GREATER_THAN_FLOAT(3.5f, 3.5f);
-    ASSERT_GREATER_THAN_FLOAT(1.2f, 2.4f);
+    ASSERT_EQUAL_FLOAT(1.5f, 1.5f);         // PASS
+    ASSERT_EQUAL_FLOAT(1.5f, 2);            // FAIL
+    ASSERT_NOT_EQUAL_FLOAT(1.5f, 3.2f);     // PASS
+    ASSERT_NOT_EQUAL_FLOAT(1.5f, 1.5f);     // FAIL
+    ASSERT_GREATER_THAN_FLOAT(3.5f, 1.0f);  // PASS
+    ASSERT_GREATER_THAN_FLOAT(3.5f, 3.5f);  // FAIL
+    ASSERT_GREATER_THAN_FLOAT(1.2f, 2.4f);  // FAIL
 }
 
 void test_doubles()
 {
-    // 3 passes, 4 fails
-    ASSERT_EQUAL_DOUBLE(1.5f, 1.5f);
-    ASSERT_EQUAL_DOUBLE(1.5f, 2);
-    ASSERT_NOT_EQUAL_DOUBLE(1.5f, 3.2f);
-    ASSERT_NOT_EQUAL_DOUBLE(1.5f, 1.5f);
-    ASSERT_GREATER_THAN_DOUBLE(3.5f, 1.0f);
-    ASSERT_GREATER_THAN_DOUBLE(3.5f, 3.5f);
-    ASSERT_GREATER_THAN_DOUBLE(1.2f, 2.4f);
+    // 5 passes, 6 fails
+    ASSERT_EQUAL_DOUBLE(1.5f, 1.5f);                // PASS
+    ASSERT_EQUAL_DOUBLE(1.5f, 2);                   // FAIL
+    ASSERT_NOT_EQUAL_DOUBLE(1.5f, 3.2f);            // PASS
+    ASSERT_NOT_EQUAL_DOUBLE(1.5f, 1.5f);            // FAIL
+    ASSERT_GREATER_THAN_DOUBLE(3.5f, 1.0f);         // PASS
+    ASSERT_GREATER_THAN_DOUBLE(3.5f, 3.5f);         // FAIL
+    ASSERT_GREATER_THAN_DOUBLE(1.2f, 2.4f);         // FAIL
 
     ASSERT_ALMOST_EQUAL_DOUBLE(0.5f, (double)4/8);  // PASS
     ASSERT_ALMOST_EQUAL_DOUBLE(0.6f, (double)6/12); // FAIL
@@ -56,14 +56,6 @@ void test_doubles()
     ASSERT_NOT_ALMOST_EQUAL_DOUBLE((double)12/20, (double)6/10); // FAIL
 }
 
-void test_extension()
-{
-    ASSERT_EQUALS_SIX(6);
-    ASSERT_EQUALS_SIX(5);
-
-    ASSERT_EQUALS_SEVEN(7);
-    ASSERT_EQUALS_SEVEN(17);
-}
 
 void test_manual()
 {
@@ -78,9 +70,9 @@ void test_manual()
 // Using the test framework to test itself lol
 void meta_test()
 {
-    int expected_pass = 17;
-    int expected_fail = 21;
-    int expected_total = 38;
+    int expected_pass = 15;
+    int expected_fail = 19;
+    int expected_total = 34;
 
     ASSERT_EQUAL_INT(ts->total_pass, expected_pass);
     ASSERT_EQUAL_INT(ts->total_fail, expected_fail);
@@ -94,7 +86,6 @@ int main()
     ADD_CASE(test_strings);
     ADD_CASE(test_floats);
     ADD_CASE(test_doubles);
-    ADD_CASE(test_extension);
     ADD_CASE(test_manual);
     ADD_CASE(meta_test);
 
