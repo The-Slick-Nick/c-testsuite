@@ -131,6 +131,8 @@ unsigned int TestSuite_vaddString(TestSuite* self, char* new_str, va_list arg_li
 
     vsnprintf((char*)(self->strlib + self->strlib_length), num_new_chars, new_str, arg_list);
     self->strlib_length += num_new_chars;
+
+
     return start_length;
 }
 
@@ -440,8 +442,11 @@ int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, .
 
     va_start(arg_list, msg);
 
-    msg_offset = TestSuite_vaddString(self, msg, arg_list);
-    file_name_offset = TestSuite_vaddString(self, file_name, arg_list);
+    msg_offset = TestSuite_addString(self, msg);
+    file_name_offset = TestSuite_addString(self, file_name);
+
+    /* msg_offset = TestSuite_vaddString(self, msg, arg_list);
+    file_name_offset = TestSuite_vaddString(self, file_name, arg_list); */
 
     current_case = (_caseitem*)(self->cases + self->length - 1);
     _caseitem_addAssertion(
@@ -470,8 +475,13 @@ int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, .
 
     va_start(arg_list, msg);
 
-    msg_offset = TestSuite_vaddString(self, msg, arg_list);
-    file_name_offset = TestSuite_vaddString(self, file_name, arg_list);
+
+
+    msg_offset = TestSuite_addString(self, msg);
+    file_name_offset = TestSuite_addString(self, file_name);
+
+    /* msg_offset = TestSuite_vaddString(self, msg, arg_list);
+    file_name_offset = TestSuite_vaddString(self, file_name, arg_list); */
 
     current_case = (_caseitem*)(self->cases + self->length - 1);
 

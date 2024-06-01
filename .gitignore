@@ -1,3 +1,9 @@
+bin/*
+*_bin
+*.o
+*.a
 .vscode
 *.exe
 todo.txt
+Makefile
+

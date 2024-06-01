@@ -1,5 +1,21 @@
+all: run_test_test clean
+
+
+run_compile_test: compile_test_bin
+	./compile_test_bin
+
+run_test_test: test_test_bin
+	./test_test_bin
+
+
 compile_test_bin: ../bin/EWENIT.a compile_test.o
 	gcc compile_test.o ../bin/EWENIT.a -o compile_test_bin
+
+test_test_bin: ../bin/EWENIT.a test_test.o
+	gcc test_test.o ../bin/EWENIT.a -o test_test_bin
+
+test_test.o: test_test.c
+	gcc -c test_test.c -o test_test.o
 
 compile_test.o: compile_test.c
 	gcc -c compile_test.c -o compile_test.o
@@ -22,4 +38,9 @@ compile_test.o: compile_test.c
 
 ../bin/double_assertions.o: ../EWENIT/double_assertions.c
 	gcc -c ../EWENIT/double_assertions.c -o  ../bin/double_assertions.o
+
+clean:
+	@rm *.o
+	@rm *_bin
+	@rm ../bin/*.o
 
