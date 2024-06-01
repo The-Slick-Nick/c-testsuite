@@ -12,6 +12,7 @@ Implemention of things defined in core.h
 #include <stdarg.h>
 
 #include "core.h"
+#include "assertion_constants.h"
 
 
 
@@ -440,13 +441,17 @@ int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, .
     unsigned int file_name_offset;
     _caseitem* current_case;
 
+    /* Apply format args to msg */
     va_start(arg_list, msg);
 
-    msg_offset = TestSuite_addString(self, msg);
-    file_name_offset = TestSuite_addString(self, file_name);
+    char fmtMsg[MSG_BUFF_SIZE];
+    vsnprintf(fmtMsg, MSG_BUFF_SIZE, msg, arg_list);
 
-    /* msg_offset = TestSuite_vaddString(self, msg, arg_list);
-    file_name_offset = TestSuite_vaddString(self, file_name, arg_list); */
+    va_end(arg_list);
+    /* -- */
+
+    msg_offset = TestSuite_addString(self, fmtMsg);
+    file_name_offset = TestSuite_addString(self, file_name);
 
     current_case = (_caseitem*)(self->cases + self->length - 1);
     _caseitem_addAssertion(
@@ -456,7 +461,6 @@ int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, .
     current_case->num_pass++;
     current_case->num_tests++;
 
-    va_end(arg_list);
     return 0;
 }
 
@@ -473,15 +477,17 @@ int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, .
     unsigned int file_name_offset;
     _caseitem* current_case;
 
+    /* Apply format args to msg */
     va_start(arg_list, msg);
 
+    char fmtMsg[MSG_BUFF_SIZE];
+    vsnprintf(fmtMsg, MSG_BUFF_SIZE, msg, arg_list);
 
+    va_end(arg_list);
+    /* -- */
 
-    msg_offset = TestSuite_addString(self, msg);
+    msg_offset = TestSuite_addString(self, fmtMsg);
     file_name_offset = TestSuite_addString(self, file_name);
-
-    /* msg_offset = TestSuite_vaddString(self, msg, arg_list);
-    file_name_offset = TestSuite_vaddString(self, file_name, arg_list); */
 
     current_case = (_caseitem*)(self->cases + self->length - 1);
 
@@ -492,6 +498,5 @@ int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, .
     current_case->num_fail++;
     current_case->num_tests++;
 
-    va_end(arg_list);
     return 0;
 }

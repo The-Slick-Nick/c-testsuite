@@ -64,7 +64,6 @@ void test_manual()
 
     TEST_FAIL("FAIL1");
     TEST_FAIL_FMT("FAIL%d", 2);
-
 }
 
 // Using the test framework to test itself lol
