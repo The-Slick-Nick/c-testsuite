@@ -116,39 +116,27 @@ void TestSuite_resizeStrlib(TestSuite* self, size_t target_size)
     self->strlib = (char*)realloc(self->strlib, self->strlib_size * sizeof(char));
 }
 
-unsigned int TestSuite_vaddString(TestSuite* self, char* new_str, va_list arg_list)
+
+// Add a string to TestSuite's string library
+// Returns offset to strlib pointer where string is now located
+unsigned int TestSuite_addString(TestSuite* self, char* new_str)
 {
     size_t num_new_chars;
     size_t target_size;
     unsigned int start_length = self->strlib_length;
 
-    // First identify how many extra characters will need added
-    num_new_chars = vsnprintf(NULL, 0, new_str, arg_list) + 1;
+    num_new_chars = strlen(new_str) + 1;
 
-    // Resize our library if needed
+    // Resize our strlib buffer ifneeded
     target_size = num_new_chars + self->strlib_length;
-    if (target_size > self->strlib_size)
+    if (target_size > self->strlib_size) {
         TestSuite_resizeStrlib(self, target_size);
+    }
 
-    vsnprintf((char*)(self->strlib + self->strlib_length), num_new_chars, new_str, arg_list);
+    strcpy((char*)(self->strlib + self->strlib_length), new_str);
     self->strlib_length += num_new_chars;
 
-
     return start_length;
-}
-
-
-// Add a string to TestSuite's string library
-// Returns offset to strlib pointer where string is now located
-unsigned int TestSuite_addString(TestSuite* self, char* new_str, ...)
-{
-    va_list arg_list;
-    int return_offset;
-
-    va_start(arg_list, new_str);
-    return_offset = TestSuite_vaddString(self, new_str, arg_list);
-    va_end(arg_list);
-    return return_offset;
 }
 
 
@@ -436,12 +424,12 @@ int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, .
     if (self->length == 0)
         return -1;
 
-    va_list arg_list;
     unsigned int msg_offset;
     unsigned int file_name_offset;
     _caseitem* current_case;
 
-    /* Apply format args to msg */
+    /* TestSuite can only add a pre-formatted string, so format it here */
+    va_list arg_list;
     va_start(arg_list, msg);
 
     char fmtMsg[MSG_BUFF_SIZE];
@@ -477,7 +465,7 @@ int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, .
     unsigned int file_name_offset;
     _caseitem* current_case;
 
-    /* Apply format args to msg */
+    /* TestSuite can only add a pre-formatted string, so format it here */
     va_start(arg_list, msg);
 
     char fmtMsg[MSG_BUFF_SIZE];
