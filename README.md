@@ -154,7 +154,7 @@ int main() {
     ADD_CASE(test4);
 
     // End
-    EWENIT_END;
+    EWENIT_END_VERBOSE;
 
     // alternatives
     // EWENIT_END_VERBOSE;
@@ -163,18 +163,96 @@ int main() {
 
 ```
 ### The output
+
+With `EWENIT_END`
+
 ```bash
+==============================
+test3
+    readme_example.c
+    [29] Fail: 4 <= 10
+------------------------------
+[0P] [1F] Total: 1
+==============================
+test4
+    readme_example.c
+    [34] Fail: String lengths differ: 11 vs 15
+      Good result
+      Another
+------------------------------
+[1P] [1F] Total: 2
+==============================
+Assertions
+[3P] [2F] Total: 5
+
+Test Cases
+[2P] [2F] Total: 4
+______________________________
+```
+
+With `EWENIT_END_VERBOSE`
+```bash
+
+==============================
+test1
+    readme_example.c
+    [19] Success: 4 == 4
+------------------------------
+[1P] [0F] Total: 1
+==============================
+String Test
+    readme_example.c
+    [24] Success: Strings differ
+      Good result
+      Bad result
+------------------------------
+[1P] [0F] Total: 1
+==============================
+test3
+    readme_example.c
+    [29] Fail: 4 <= 10
+------------------------------
+[0P] [1F] Total: 1
+==============================
+test4
+    readme_example.c
+    [34] Fail: String lengths differ: 11 vs 15
+      Good result
+      Another
+    [35] Success: Strings differ
+      Good result
+      Bad one again
+------------------------------
+[1P] [1F] Total: 2
+==============================
+Assertions
+[3P] [2F] Total: 5
+
+Test Cases
+[2P] [2F] Total: 4
 
 ```
 
-## Macros
+With `EWENIT_END_COMPACT`
+```bash
+==============================
+test1: Passed [P]
+String Test: Passed [P]
+test3: Failed [F]
+test4: Failed [FP]
+==============================
+Assertions [3P] [2F] Total: 5
+Test Cases [2P] [2F] Total: 4
+```
+
+## EWENIT Macros
 
 ### Initialization
 ##### `EWENIT_START`
 Begins and prepares the test suite. Must be called before any 
 assertions can be made.
 ##### `TEST_START`
-An alias for EWENIT_START
+An alias for `EWENIT_START`
 ***
 ### Ending
 Each ending macro ends the test suite - it must be called after `EWENIT_START` (or equivalent) and after some test cases have been added. Note that there are several options, but only one may be used per suite.
