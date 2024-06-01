@@ -1,12 +1,104 @@
 # EWENIT v2.0.1
 A basic unit testing framework for C.
 ## Usage
+The basic flow of creating a test file using this framework is as below:
+* [Include header](#include-header)
+* [Define test suite](#define-test-suite)
+* [Begin suite](#begin-suite)
+* [Add cases](#add-cases)
+* [End suite](#end-suite)
+
+### Include header
 
 ```.c
-#include "EWENIT.h" /* or wherever the header is located */
+/* test.c */
+#include "EWENIT.h"
 ```
 
+### Define test suite
+A test suite exists in some *.c file, under main function. When built and run,
+we want the tests to fire off by going through main
+```c
+/* test.c */
+#include "EWENIT.h"
+
+
+int main() {
+    /* My test suite */
+    return 0;
+}
+```
+
+### Begin suite
+Each test suite must be initialized by a call to macro `EWENIT_START` within `EWENIT.h`
+
+```c
+/* test.c */
+#include "EWENIT.h"
+
+
+int main() {
+    /* My test suite */
+    EWENIT_START;
+    return 0;
+}
+```
+
+### Add cases
+Each test suite consists of test cases - functions with a void return type taking no arguments
+that invoke one (or more) of [assertion macros](#assertions) defined in this library.
+An "assertion" is a specific expectation about the behavior of the code being tested.
+Each assertion passes or fails based on the state of the values passed,
+deciding if that expectation was met or not. These will be reported on when the test suite is run.
+```c
+/* test.c */
+#include "EWENIT.h"
+void test1() {
+    ASSERT_EQUAL_INT(1, 1); // passes
+}
+
+void test2() {
+    ASSERT_FALSE(true); // fails
+}
+
+int main() {
+    /* My test suite */
+    EWENIT_START;
+    ADD_CASE(test1);
+    ADD_CASE(test2);
+    return 0;
+}
+```
+
+### End suite
+Each suite ends with a specific call to an ending macro `EWENIT_END` or an alternative
+(more listed [below](#ending)). This call runs each test case and reports out on the
+overall status of the suite.
+
+```c
+/* test.c */
+#include "EWENIT.h"
+void test1() {
+    ASSERT_EQUAL_INT(1, 1); // passes
+}
+
+void test2() {
+    ASSERT_FALSE(true); // fails
+}
+
+int main() {
+    /* My test suite */
+    EWENIT_START;
+    ADD_CASE(test1);
+    ADD_CASE(test2);
+    EWENIT_END;
+    return 0;
+}
+```
+
+
 ## An Example
+### The code
 ```c
 /* example_test.c */
 
@@ -29,13 +121,11 @@ char* strFunc() {
 void test1() {
     int intResult = intFunc();
     ASSERT_EQUAL_INT(intResult, 4); // succeeds
-    return 0;
 }
 
 void test2() {
     char* strResult = strFunc();
     ASSERT_NOT_EQUAL_STR(strResult, "Bad result"); // succeeds
-    return 0;
 }
 
 void test3() {
@@ -52,13 +142,28 @@ void test4() {
 // Run suite
 
 int main() {
+
+    // Initialize test suite
     EWENIT_START;
+
+    // Add tests cases - each of which includes one (or more)
+    // assertions
     ADD_CASE(test1);
     ADD_CASE_CUSTOM(test2, "String Test");
     ADD_CASE(test3);
     ADD_CASE(test4);
+
+    // End
     EWENIT_END;
+
+    // alternatives
+    // EWENIT_END_VERBOSE;
+    // EWENIT_END_COMPACT;
 }
+
+```
+### The output
+```bash
 
 ```
 
@@ -72,15 +177,19 @@ assertions can be made.
 An alias for EWENIT_START
 ***
 ### Ending
+Each ending macro ends the test suite - it must be called after `EWENIT_START` (or equivalent) and after some test cases have been added. Note that there are several options, but only one may be used per suite.
 ##### `EWENIT_END`
+Finalize, commit, run, and report on the current test suite. Prints a status report out of each test, showing only those tests with failed assertions (and information about those assertions.
 ##### `TEST_END`
 An alias for EWENIT_END.
 ##### `EWENIT_END_COMPACT`
+Commit & run the current test suite, reporting a condensed output of test successes & failures. 
 ##### `TEST_END_COMPACT`
-An alias for EWENIT_END_COMPACT
+An alias for `EWENIT_END_COMPACT`
 ##### `EWENIT_END_VERBOSE`
+Commit & run the test suite, reporting a more detailed summary of each test case. Formatted just like `EWENIT_END`, but includes a report-out on each success as well.
 ##### `TEST_END_VERBOSE`
-An alias for EWENIT_END_VERBOSE
+An alias for `EWENIT_END_VERBOSE`
 ***
 ### Test case management
 ##### `ADD_CASE(func)`

@@ -156,7 +156,7 @@ void _caseitem_print(_caseitem* self, char* strlib)
     char* last_file_name = "";
     _assertionitem* ass;
 
-    // Pointer to name of case
+    // for convenience
     case_name = (char*)(strlib + self->name_offset);
 
     PRINT_DOUBLE_LINE;
@@ -164,10 +164,12 @@ void _caseitem_print(_caseitem* self, char* strlib)
 
     for (int i = 0; i < self->length; i++)
     {
-        ass = (_assertionitem*)(self->assertions + i - 1);
+/*         ass = (_assertionitem*)(self->assertions + i - 1); */
+        ass = (_assertionitem*)(self->assertions + i);
         // Regular print - don't report on successes
-        if (ass->status_code != STATUS_CODE_FAIL)
+        if (ass->status_code != STATUS_CODE_FAIL) {
             continue;
+        }
 
         file_name = (char*)(strlib + ass->file_name_offset);
         if (strcmp(file_name, last_file_name) != 0)
@@ -228,13 +230,17 @@ void _caseitem_printVerbose(_caseitem* self, char* strlib)
 {
     if (self->num_tests == 0 || !self->is_committed)
         return;
+
+
     char* file_name;
     char* last_file_name = "";
     _assertionitem* ass;
 
+    // for convenience
+    char* case_name = (char*)(strlib + self->name_offset);
 
     PRINT_DOUBLE_LINE;
-    printf("%s\n", strlib + self->name_offset);
+    printf("%s\n", case_name);
 
     for (int i = 0; i < self->length; i++)
     {
