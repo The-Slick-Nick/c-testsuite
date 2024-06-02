@@ -1,4 +1,4 @@
-# EWENIT v2.0.1
+# EWENIT v2.0.2
 A basic unit testing framework for C.
 ## Usage
 The basic flow of creating a test file using this framework is as below:
