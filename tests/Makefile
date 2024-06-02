@@ -1,21 +1,23 @@
-CC ?= gcc
+CC = gcc
 CFLAGS = -Wall --std=gnu99
-INCLUDE = -I ../src/
+LIBDIR = ../lib
+INCLDIR = ../include
 
+all: run_test_test clean
 
-all: build_lib run_test_test clean
-
-build_lib:
+$(LIBDIR)/libEWENIT.a:
 	make -C ..
 
 run_test_test: test_test_bin
 	./$<
 
-test_test_bin: test_test.o ../bin/EWENIT.a
-	@$(CC) $^ -o $@
+test_test_bin: test_test.o $(LIBDIR)/libEWENIT.a
+	$(CC) -o test_test_bin test_test.o -L$(LIBDIR) -l:libEWENIT.a
+	# @$(CC) test_test.o ../lib/EWENIT.a -o $@
 
 test_test.o: test_test.c
-	@$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+	echo $(INCLDIR)
+	$(CC) $(CFLAGS) -c -I$(INCLDIR) $< -o $@
 
 clean:
 	@rm *.o

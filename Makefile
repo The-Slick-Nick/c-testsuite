@@ -1,9 +1,9 @@
 CC ?= gcc
 
-BIN ?= ./bin
+LIB ?= ./lib
 INCL ?= ./include
 
-TARGET ?= ./bin/EWENIT.a
+TARGET ?= $(LIB)/libEWENIT.a
 
 SOURCES ?= $(wildcard ./src/*.c)
 HEADERS ?= $(wildcard ./src/*.h)
@@ -11,7 +11,7 @@ SRC_OBJS = $(patsubst ./src/%.c, %.o, $(SOURCES))
 
 all: move build clean
 
-move: $(BIN) $(INCL)
+move: $(LIB) $(INCL)
 	@cp $(HEADERS) $(INCL)
 
 build: $(TARGET)
@@ -26,7 +26,7 @@ $(SRC_OBJS): %.o: ./src/%.c
 	@$(CC) $(CFLAGS) -I $(INCL) -c $< -o $@
 
 
-$(BIN):
+$(LIB):
 	@mkdir -p $@
 
 $(INCL):
