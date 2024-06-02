@@ -1,11 +1,7 @@
 CC ?= gcc
 CFLAGS = -Wall --std=gnu99
 INCLUDE = -I ../src/
-SRC_DIR = ../src
 
-SRCS = $(wildcard $(SRC_DIR)/*.c)
-SRC_OBJS = $(patsubst $(SRC_DIR)/%.c,%.o,$(SRCS))
-SRCLIB = $(BIN_DIR)/EWENIT.a
 
 all: build_lib run_test_test clean
 
