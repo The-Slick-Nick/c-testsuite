@@ -1,5 +1,23 @@
 # EWENIT v2.0.2
 A basic unit testing framework for C.
+## Install
+
+* Download the zip for the latest version version from 
+https://github.com/The-Slick-Nick/c-testsuite/tags
+
+* Unzip to desired directory and navigate there
+
+To build locally, run make
+```bash
+$ make
+```
+
+* To build and install in user folder, use the install task
+```bash
+$ sudo make install
+```
+
+
 ## Usage
 The basic flow of creating a test file using this framework is as below:
 * [Include header](#include-header)
