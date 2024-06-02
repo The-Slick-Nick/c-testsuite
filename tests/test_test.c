@@ -1,4 +1,4 @@
-#include "../EWENIT/EWENIT.h"
+#include "EWENIT.h"
 
 
 void test_integers()
