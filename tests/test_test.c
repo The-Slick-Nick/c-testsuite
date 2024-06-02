@@ -1,4 +1,4 @@
-#include "../EWENIT/EWENIT.h"
+#include "EWENIT.h"
 
 
 void test_integers()
@@ -64,7 +64,6 @@ void test_manual()
 
     TEST_FAIL("FAIL1");
     TEST_FAIL_FMT("FAIL%d", 2);
-
 }
 
 // Using the test framework to test itself lol
@@ -88,6 +87,5 @@ int main()
     ADD_CASE(test_doubles);
     ADD_CASE(test_manual);
     ADD_CASE(meta_test);
-
-    EWENIT_END;
+    EWENIT_END_COMPACT;
 }

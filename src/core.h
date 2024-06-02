@@ -101,8 +101,7 @@ HANDLING STRLIB
 ----------------------------------------------------------------------------------------*/
 
 void TestSuite_resizeStrlib(TestSuite* self, size_t target_size);
-unsigned int TestSuite_vaddString(TestSuite* self, char* new_str, va_list arg_list);
-unsigned int TestSuite_addString(TestSuite* self, char* new_str, ...);
+unsigned int TestSuite_addString(TestSuite* self, char* new_str);
 
 /*----------------------------------------------------------------------------------------
 PRINT METHODS

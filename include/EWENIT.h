@@ -1,6 +1,6 @@
 /*========================================================================================
 EWENIT.c
-Version 2.0.0
+Version 2.0.1
 
 ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣐⡙⠶⣿⣷⣌⡳⣿⡿⠿⢷⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⣠⡴⠮⠁⠀⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠙⠟⢿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -118,6 +118,7 @@ TestSuite* ts;
 
 // Allow manual PASS/FAIL macros to use formatted arguments if compiler supports it
 #if OPTIONAL_VARIADIC_SUPPORTED
+
     #define TEST_PASS(msg, ...)                 TestSuite_pass(ts, __FILE__, __LINE__, msg, ##__VA_ARGS__)
     #define TEST_FAIL(msg, ...)                 TestSuite_fail(ts, __FILE__, __LINE__, msg, ##__VA_ARGS__)
 #else
