@@ -41,7 +41,6 @@ TestSuite* TestSuite_init()
     self->cases = (_caseitem*)malloc(4 * sizeof(_caseitem));
 
     return self;
-    
 }
 
 // Initializes an already allocated _caseitem
