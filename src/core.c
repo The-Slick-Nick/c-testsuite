@@ -469,7 +469,7 @@ int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, .
         current_case, STATUS_CODE_PASS, msg_offset, file_name_offset, line_num 
     );
 
-    // NOTE for future refactor: Below portion needs to be kept
+    // NOTE for future refactor: Below portion needs to be kept failure-specific
     current_case->num_pass++;
     current_case->num_tests++;
 
@@ -543,7 +543,7 @@ int TestSuite_info(TestSuite* self, char* file_name, long line_num, char* msg, .
     current_case = (_caseitem*)(self->cases + self->length - 1);
 
     _caseitem_addAssertion(
-        current_case, STATUS_CODE_FAIL, msg_offset, file_name_offset, line_num
+        current_case, STATUS_CODE_INFO, msg_offset, file_name_offset, line_num
     );
 
     return 0;

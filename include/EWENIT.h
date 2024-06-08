@@ -1,6 +1,6 @@
 /*========================================================================================
 EWENIT.c
-Version 2.0.1
+Version 2.1.0
 
 ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣐⡙⠶⣿⣷⣌⡳⣿⡿⠿⢷⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⣠⡴⠮⠁⠀⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠙⠟⢿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -46,6 +46,8 @@ Version 2.0.1
 
 #ifndef INCLUDE_GUARD_EWENIT
 #define INCLUDE_GUARD_EWENIT
+
+#define EWENIT_VERSION "2.1.0"
 
 #include "core.h"
 #include "int_assertions.h"
@@ -94,6 +96,8 @@ TestSuite* ts;
                                                 ERROR_CHECK(assert_not_almost_equal_double(ts, val1, val2, __FILE__, __LINE__))
 
 
+// int TestSuite_info(TestSuite* self, char* file_name, long line_num, char* msg, ...);
+
 
 #define EWENIT_START                            ts = TestSuite_init();
 #define TEST_START                              EWENIT_START
@@ -116,21 +120,26 @@ TestSuite* ts;
 #define ADD_CASE(func)                          TestSuite_newCase(ts, #func); func()
 #define ADD_CASE_CUSTOM(func, name)             TestSuite_newCase(ts, name); func()
 
+
+/* ========================================================================================*/
+/* Assertion supplements */
+
 // Allow manual PASS/FAIL macros to use formatted arguments if compiler supports it
 #if OPTIONAL_VARIADIC_SUPPORTED
 
-    #define TEST_PASS(msg, ...)                 TestSuite_pass(ts, __FILE__, __LINE__, msg, ##__VA_ARGS__)
-    #define TEST_FAIL(msg, ...)                 TestSuite_fail(ts, __FILE__, __LINE__, msg, ##__VA_ARGS__)
+    #define TEST_PASS(msg, ...)                 ERROR_CHECK(TestSuite_pass(ts, __FILE__, __LINE__, msg, ##__VA_ARGS__))
+    #define TEST_FAIL(msg, ...)                 ERROR_CHECK(TestSuite_fail(ts, __FILE__, __LINE__, msg, ##__VA_ARGS__))
+    #define INFO(msg, ...)                      ERROR_CHECK(TestSuite_info(ts, __FILE__, __LINE__, msg, ##__VA_ARGS__))
 #else
-    #define TEST_PASS(msg)                      TestSuite_pass(ts, __FILE__, __LINE__, msg)
-    #define TEST_FAIL(msg)                      TestSuite_fail(ts, __FILE__, __LINE__, msg)
+    #define TEST_PASS(msg)                      ERROR_CHECK(TestSuite_pass(ts, __FILE__, __LINE__, msg))
+    #define TEST_FAIL(msg)                      ERROR_CHECK(TestSuite_fail(ts, __FILE__, __LINE__, msg))
+    #define INFO(msg)                           ERROR_CHECK(TestSuite_info(ts, __FILE__, __LINE__, msg))
 #endif
 
 // Provide a formatting-supported version of the macro regardless
 #define TEST_PASS_FMT(msg, ...)                 TestSuite_pass(ts, __FILE__, __LINE__, msg, __VA_ARGS__)
 #define TEST_FAIL_FMT(msg, ...)                 TestSuite_fail(ts, __FILE__, __LINE__, msg, __VA_ARGS__)
-
-
+#define INFO_FMT(msg, ...)                      ERROR_CHECK(TestSuite_info(ts, __FILE__, __LINE__, msg, __VA_ARGS__)
 
 
 #endif

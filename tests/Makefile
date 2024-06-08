@@ -3,7 +3,7 @@ CFLAGS = -Wall --std=gnu99
 LIBDIR = ../lib
 INCLDIR = ../include
 
-all: run_test_test clean
+all: clean run_test_test clean
 
 $(LIBDIR)/libEWENIT.a:
 	make -C ..
@@ -20,5 +20,5 @@ test_test.o: test_test.c
 	$(CC) $(CFLAGS) -c -I$(INCLDIR) $< -o $@
 
 clean:
-	@rm *.o
-	@rm *_bin
+	@rm -f *.o
+	@rm -f *_bin

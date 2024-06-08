@@ -42,8 +42,10 @@ void test_doubles()
 {
     // 5 passes, 6 fails
     ASSERT_EQUAL_DOUBLE(1.5f, 1.5f);                // PASS
+    INFO("Below test should fail");
     ASSERT_EQUAL_DOUBLE(1.5f, 2);                   // FAIL
     ASSERT_NOT_EQUAL_DOUBLE(1.5f, 3.2f);            // PASS
+    INFO("This is an info message in doubles");
     ASSERT_NOT_EQUAL_DOUBLE(1.5f, 1.5f);            // FAIL
     ASSERT_GREATER_THAN_DOUBLE(3.5f, 1.0f);         // PASS
     ASSERT_GREATER_THAN_DOUBLE(3.5f, 3.5f);         // FAIL
@@ -88,4 +90,5 @@ int main()
     ADD_CASE(test_manual);
     ADD_CASE(meta_test);
     EWENIT_END_VERBOSE;
+    printf("%s\n", EWENIT_VERSION);
 }
