@@ -1,4 +1,4 @@
-# EWENIT v2.1.0
+# EWENIT v2.1.1
 A basic unit testing framework for C.
 ## Install
 

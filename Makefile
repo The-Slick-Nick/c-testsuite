@@ -37,7 +37,7 @@ build: $(TARGET)
 clean:
 	@rm -f *.o
 
-$(TARGET): $(SRC_OBJS)
+$(TARGET): $(SRC_OBJS) $(HEADERS)
 	@ar rvs $@ $^
 
 $(SRC_OBJS): %.o: ./src/%.c

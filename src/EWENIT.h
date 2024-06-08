@@ -1,6 +1,6 @@
 /*========================================================================================
 EWENIT.c
-Version 2.1.0
+Version 2.1.1
 
 ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣐⡙⠶⣿⣷⣌⡳⣿⡿⠿⢷⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⣠⡴⠮⠁⠀⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠙⠟⢿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -47,7 +47,7 @@ Version 2.1.0
 #ifndef INCLUDE_GUARD_EWENIT
 #define INCLUDE_GUARD_EWENIT
 
-#define EWENIT_VERSION "2.1.0"
+#define EWENIT_VERSION "2.1.1"
 
 #include "core.h"
 #include "int_assertions.h"
