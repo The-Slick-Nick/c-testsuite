@@ -1,4 +1,4 @@
-# EWENIT v2.0.2
+# EWENIT v2.1.0
 A basic unit testing framework for C.
 ## Install
 
@@ -14,7 +14,7 @@ $ make
 
 * To build and install in user folder, use the install task
 ```bash
-$ sudo make install
+$ make install
 ```
 
 
@@ -338,5 +338,9 @@ ADD_CASE(func, "Nicer name for func");
 Manually log a success with the provided message.
 ##### `TEST_PASS_FMT(msg, ...)`
 Manually log a success with the provided message with support for format arguments (%d, %f, %s, etc.)
-
+#### Information
+##### `INFO(msg)`
+Insert an informational message into the final test output.
+##### `INFO_FMT(msg, ...)`
+Insert an informational message into the final test output.
 
