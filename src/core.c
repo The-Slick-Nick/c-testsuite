@@ -390,13 +390,16 @@ void TestSuite_resizeCases(TestSuite* self)
 // it, adding success/fail/total counts to TestSuite and flagging it as considered
 int TestSuite_commitCase(TestSuite* self)
 {
-    if (self->length == 0)
+    // There must be at least one case for there to be an assertion
+    if (self->length == 0) {
         return -1;
+    }
 
     _caseitem* current = (_caseitem*)(self->cases + self->length - 1);
 
-    if (current->is_committed)
+    if (current->is_committed) {
         return -1;
+    }
 
     self->total_pass += current->num_pass;
     self->total_fail += current->num_fail;
@@ -405,10 +408,12 @@ int TestSuite_commitCase(TestSuite* self)
     self->num_cases++;
 
     // Determine if the case as a whole succeeded or failed
-    if (current->num_fail > 0)
+    if (current->num_fail > 0) {
         self->cases_fail++;
-    else    
+    }
+    else {
         self->cases_pass++;
+    }
 
     current->is_committed = true;
     return 0;
@@ -424,8 +429,9 @@ int TestSuite_newCase(TestSuite* self, char* case_name)
     // Add case_name to string library and remember offset to point to
     unsigned int case_name_offset = TestSuite_addString(self, case_name);
 
-    if (self->length >= self->_size)
+    if (self->length >= self->_size) {
         TestSuite_resizeCases(self);
+    }
 
     _caseitem_init((_caseitem*)(self->cases + self->length), case_name_offset);
     self->length++;
@@ -437,8 +443,9 @@ int TestSuite_newCase(TestSuite* self, char* case_name)
 // Public method
 int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, ...)
 {
-    if (self->length == 0)
+    if (self->length == 0) {
         return -1;
+    }
 
     unsigned int msg_offset;
     unsigned int file_name_offset;
@@ -462,6 +469,7 @@ int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, .
         current_case, STATUS_CODE_PASS, msg_offset, file_name_offset, line_num 
     );
 
+    // NOTE for future refactor: Below portion needs to be kept
     current_case->num_pass++;
     current_case->num_tests++;
 
@@ -473,8 +481,10 @@ int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, .
 // Public method
 int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, ...)
 {
-    if (self->length == 0)
+    // There must be at least one case for there to be an assertion
+    if (self->length == 0) {
         return -1;
+    }
 
     va_list arg_list;
     unsigned int msg_offset;
@@ -499,8 +509,42 @@ int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, .
         current_case, STATUS_CODE_FAIL, msg_offset, file_name_offset, line_num 
     );
 
+    // NOTE for future refactor: Below portion needs to be kept failure-specific
     current_case->num_fail++;
     current_case->num_tests++;
+
+    return 0;
+}
+
+// Call to generate a dummy assertion that is neither a pass nor failure that
+// will emit a custom message in the final report-out
+int TestSuite_info(TestSuite* self, char* file_name, long line_num, char* msg, ...)
+{
+    // There must be at least one case for there to be an assertion
+    if (self->length == 0) {
+        return -1;
+    }
+
+    va_list arg_list;
+    unsigned int msg_offset;
+    unsigned int file_name_offset;
+    _caseitem* current_case;
+
+    va_start(arg_list, msg);
+
+    char fmtMsg[MSG_BUFF_SIZE];
+    vsnprintf(fmtMsg, MSG_BUFF_SIZE, msg, arg_list);
+
+    va_end(arg_list);
+
+    msg_offset = TestSuite_addString(self, fmtMsg);
+    file_name_offset = TestSuite_addString(self, file_name);
+
+    current_case = (_caseitem*)(self->cases + self->length - 1);
+
+    _caseitem_addAssertion(
+        current_case, STATUS_CODE_FAIL, msg_offset, file_name_offset, line_num
+    );
 
     return 0;
 }

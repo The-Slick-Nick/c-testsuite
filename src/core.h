@@ -23,7 +23,7 @@ and should probably never be directly called outside of this file.
 #include <stdbool.h>
 #include <stdarg.h>
 
-#define STATUS_CODE_INFO     1  // Code for a "dummy" assertion that only exists to insert a message into the output
+#define STATUS_CODE_INFO     1
 #define STATUS_CODE_PASS     0
 #define STATUS_CODE_FAIL    -1
 
@@ -137,6 +137,6 @@ int TestSuite_commitCase(TestSuite* self);
 int TestSuite_newCase(TestSuite* self, char* case_name);
 int TestSuite_pass(TestSuite* self, char* file_name, long line_num, char* msg, ...);
 int TestSuite_fail(TestSuite* self, char* file_name, long line_num, char* msg, ...);
-
+int TestSuite_info(TestSuite* self, char* file_name, long line_num, char* msg, ...);
 
 #endif

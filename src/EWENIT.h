@@ -1,6 +1,6 @@
 /*========================================================================================
 EWENIT.c
-Version 2.0.1
+Version 2.1.0
 
 ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣐⡙⠶⣿⣷⣌⡳⣿⡿⠿⢷⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⣠⡴⠮⠁⠀⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠙⠟⢿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -93,7 +93,7 @@ TestSuite* ts;
 #define ASSERT_NOT_ALMOST_EQUAL_DOUBLE(val1, val2) \
                                                 ERROR_CHECK(assert_not_almost_equal_double(ts, val1, val2, __FILE__, __LINE__))
 
-
+#define PRINT_MSG(msg)                          ERROR_CHECK(0)
 
 #define EWENIT_START                            ts = TestSuite_init();
 #define TEST_START                              EWENIT_START
