@@ -139,7 +139,7 @@ TestSuite* ts;
 // Provide a formatting-supported version of the macro regardless
 #define TEST_PASS_FMT(msg, ...)                 TestSuite_pass(ts, __FILE__, __LINE__, msg, __VA_ARGS__)
 #define TEST_FAIL_FMT(msg, ...)                 TestSuite_fail(ts, __FILE__, __LINE__, msg, __VA_ARGS__)
-#define INFO_FMT(msg, ...)                      ERROR_CHECK(TestSuite_info(ts, __FILE__, __LINE__, msg, __VA_ARGS__)
+#define INFO_FMT(msg, ...)                      ERROR_CHECK(TestSuite_info(ts, __FILE__, __LINE__, msg, __VA_ARGS__))
 
 
 #endif
