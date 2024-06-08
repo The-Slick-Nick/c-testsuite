@@ -87,5 +87,5 @@ int main()
     ADD_CASE(test_doubles);
     ADD_CASE(test_manual);
     ADD_CASE(meta_test);
-    EWENIT_END_COMPACT;
+    EWENIT_END_VERBOSE;
 }

@@ -23,8 +23,8 @@ and should probably never be directly called outside of this file.
 #include <stdbool.h>
 #include <stdarg.h>
 
-
-#define STATUS_CODE_PASS    0
+#define STATUS_CODE_INFO     1  // Code for a "dummy" assertion that only exists to insert a message into the output
+#define STATUS_CODE_PASS     0
 #define STATUS_CODE_FAIL    -1
 
 #define PRINT_SINGLE_LINE   printf("------------------------------\n")

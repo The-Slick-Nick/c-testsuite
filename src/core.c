@@ -163,10 +163,10 @@ void _caseitem_print(_caseitem* self, char* strlib)
 
     for (int i = 0; i < self->length; i++)
     {
-/*         ass = (_assertionitem*)(self->assertions + i - 1); */
         ass = (_assertionitem*)(self->assertions + i);
+
         // Regular print - don't report on successes
-        if (ass->status_code != STATUS_CODE_FAIL) {
+        if (ass->status_code == STATUS_CODE_PASS) {
             continue;
         }
 
@@ -177,7 +177,13 @@ void _caseitem_print(_caseitem* self, char* strlib)
         last_file_name = file_name;
 
         printf("    [%d] ", ass->line_num);
-        printf("Fail");
+
+        if (ass->status_code == STATUS_CODE_FAIL) {
+            printf("Fail");
+        }
+        else if (ass->status_code == STATUS_CODE_INFO) {
+            printf("Info");
+        }
         printf(": %s\n", (strlib + ass->msg_offset));
     }   
 
@@ -218,6 +224,8 @@ void _caseitem_printCompact(_caseitem* self, char* strlib)
             case STATUS_CODE_FAIL:
                 printf("F");
                 break;
+            case STATUS_CODE_INFO:
+            // Info "assertions" are unnecessary in compact print-out
             default:
                 break;
         }
@@ -251,7 +259,7 @@ void _caseitem_printVerbose(_caseitem* self, char* strlib)
 
         last_file_name = file_name;
         printf("    [%d] ", ass->line_num);
-        // Regular print - don't report on successes
+     
         switch (ass->status_code)
         {
             case STATUS_CODE_PASS:
@@ -259,6 +267,9 @@ void _caseitem_printVerbose(_caseitem* self, char* strlib)
                 break;
             case STATUS_CODE_FAIL:
                 printf("Fail");
+                break;
+            case STATUS_CODE_INFO:
+                printf("Info");
                 break;
         }
         printf(": %s\n", (strlib + ass->msg_offset));
