@@ -314,6 +314,7 @@ void TestSuite_printCompact(TestSuite* self, char* ewenitVersion)
 {
     PRINT_DOUBLE_LINE;
     printf("EWENIT Version %s\n", ewenitVersion);
+    PRINT_DOUBLE_LINE;
 
     for (int i = 0; i < self->length; i++)
     {
