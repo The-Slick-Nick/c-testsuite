@@ -106,18 +106,18 @@ TestSuite* ts;
 #define EWENIT_START                            ts = TestSuite_init();
 #define TEST_START                              EWENIT_START
 #define EWENIT_END                              TestSuite_commitCase(ts);\
-                                                TestSuite_print(ts);\
+                                                TestSuite_print(ts, EWENIT_VERSION);\
                                                 TestSuite_deconstruct(ts)
 #define TEST_END                                EWENIT_END
 
 // Support a compact version of final error reporting
 #define EWENIT_END_COMPACT                      TestSuite_commitCase(ts);\
-                                                TestSuite_printCompact(ts);\
+                                                TestSuite_printCompact(ts, EWENIT_VERSION);\
                                                 TestSuite_deconstruct(ts);
 #define TEST_END_COMPACT                        EWENIT_END_COMPACT
 
 #define EWENIT_END_VERBOSE                      TestSuite_commitCase(ts);\
-                                                TestSuite_printVerbose(ts);\
+                                                TestSuite_printVerbose(ts, EWENIT_VERSION);\
                                                 TestSuite_deconstruct(ts);
 #define TEST_END_VERBOSE                        EWENIT_END_VERBOSE
 

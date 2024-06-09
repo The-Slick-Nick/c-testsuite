@@ -283,8 +283,10 @@ void _caseitem_printVerbose(_caseitem* self, char* strlib)
 }
 
 // Default print method. Prints full test case report, but excludes successes
-void TestSuite_print(TestSuite* self)
+void TestSuite_print(TestSuite* self, char* ewenitVersion)
 {
+    PRINT_DOUBLE_LINE;
+    printf("EWENIT Version %s\n", ewenitVersion);
 
     _caseitem* current_case;
     
@@ -308,9 +310,11 @@ void TestSuite_print(TestSuite* self)
 }
 
 // Public method
-void TestSuite_printCompact(TestSuite* self)
+void TestSuite_printCompact(TestSuite* self, char* ewenitVersion)
 {
     PRINT_DOUBLE_LINE;
+    printf("EWENIT Version %s\n", ewenitVersion);
+
     for (int i = 0; i < self->length; i++)
     {
         _caseitem_printCompact(self->cases + i, self->strlib);
@@ -324,8 +328,11 @@ void TestSuite_printCompact(TestSuite* self)
     printf("[%dP] [%dF] Total: %d\n", self->cases_pass, self->cases_fail, self->num_cases);
 }
 
-void TestSuite_printVerbose(TestSuite* self)
+void TestSuite_printVerbose(TestSuite* self, char* ewenitVersion)
 {
+    PRINT_DOUBLE_LINE;
+    printf("EWENIT Version %s\n", ewenitVersion);
+
     _caseitem* current_case;
 
     for (int i = 0; i < self->length; i++)

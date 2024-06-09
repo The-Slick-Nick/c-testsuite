@@ -116,12 +116,12 @@ void _caseitem_printCompact(_caseitem* self, char* strlib);
 void _caseitem_printVerbose(_caseitem* self, char* strlib);
 
 // Default print method. Prints full test case report, but excludes successes
-void TestSuite_print(TestSuite* self);
+void TestSuite_print(TestSuite* self, char* ewenitVersion);
 
 // Public method
-void TestSuite_printCompact(TestSuite* self);
-
-void TestSuite_printVerbose(TestSuite* self);
+void TestSuite_printCompact(TestSuite* self, char* ewenitVersion);
+// Print method - prints out full detail of every test case, skipping none.
+void TestSuite_printVerbose(TestSuite* self, char* ewenitVersion);
 
 /*----------------------------------------------------------------------------------------
 ASSERTION/TEST CASE MANAGEMENT
