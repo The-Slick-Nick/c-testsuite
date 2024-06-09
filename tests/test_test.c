@@ -4,7 +4,6 @@
 void test_integers()
 {
     // 3 passes, 4 fails
-
     ASSERT_EQUAL_INT(1, 1);
     INFO("Below test should fail");
     ASSERT_EQUAL_INT(2, 1);
@@ -17,6 +16,23 @@ void test_integers()
     ASSERT_GREATER_THAN_INT(2, 6);
     INFO("Below test should fail");
     ASSERT_GREATER_THAN_INT(2, 2);
+}
+
+void test_longs() {
+    // 3 passes, 4 fails
+    
+    ASSERT_EQUAL_LONG(1, 1);
+    INFO("Below test should fail");
+    ASSERT_EQUAL_LONG(2, 1);
+    ASSERT_NOT_EQUAL_LONG(3, 45);
+    INFO("Below test should fail");
+    ASSERT_NOT_EQUAL_LONG(10, 10);
+
+    ASSERT_GREATER_THAN_LONG(5, 1);
+    INFO("Below test should fail");
+    ASSERT_GREATER_THAN_LONG(2, 6);
+    INFO("Below test should fail");
+    ASSERT_GREATER_THAN_LONG(2, 2);
 }
 
 void test_strings()
@@ -83,9 +99,9 @@ void test_manual()
 // Using the test framework to test itself lol
 void meta_test()
 {
-    int expected_pass = 15;
-    int expected_fail = 19;
-    int expected_total = 34;
+    int expected_pass = 18;
+    int expected_fail = 23;
+    int expected_total = 41;
 
     ASSERT_EQUAL_INT(ts->total_pass, expected_pass);
     ASSERT_EQUAL_INT(ts->total_fail, expected_fail);
@@ -96,6 +112,7 @@ int main()
 {
     EWENIT_START;
     ADD_CASE(test_integers);
+    ADD_CASE(test_longs);
     ADD_CASE(test_strings);
     ADD_CASE(test_floats);
     ADD_CASE(test_doubles);
