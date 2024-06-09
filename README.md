@@ -1,4 +1,4 @@
-# EWENIT v2.1.1
+# EWENIT v2.2.0
 A basic unit testing framework for C.
 ## Install
 
@@ -315,6 +315,10 @@ ADD_CASE(func, "Nicer name for func");
 ##### `ASSERT_EQUAL_INT(val1, val2)`
 ##### `ASSERT_NOT_EQUAL_INT(val1, val2)`
 ##### `ASSERT_GREATER_THAN_INT(val1, val2)`
+#### Longs
+##### `ASSERT_EQUAL_LONG(val1, val2)`
+##### `ASSERT_NOT_EQUAL_LONG(val1, val2)`
+##### `ASSERT_GREATER_THAN_LONG(val1, val2)`
 #### Booleans
 ##### `ASSERT_TRUE(val)`
 ##### `ASSERT_FALSE(val)`
