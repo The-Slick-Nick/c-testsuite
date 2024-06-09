@@ -9,18 +9,28 @@ Also includes boolean checks
 
 #include "core.h"
 
-// Compares two ints for exact equality
+/* ============================================================================
+ *  INTEGER ASSERTIONS
+ * ========================================================================= */
 int assert_equal_int(TestSuite* ts, int val1, int val2, char* file_name, long line_num);
-// Compare two ints to assess their inequality
 int assert_not_equal_int(TestSuite* ts, int val1, int val2, char* file_name, long line_num);
-
-// Compare two ints and assert that val1 > val2
 int assert_greater_than_int(TestSuite* ts, int val1, int val2, char* file_name, long line_num);
 
-// Ensure value is true
-int assert_true(TestSuite* ts, int val1, char* file_name, long line_num);
 
-// Ensure value is false
+/* ============================================================================
+ *  BOOLEAN ASSERTIONS
+ * ========================================================================= */
+int assert_true(TestSuite* ts, int val1, char* file_name, long line_num);
 int assert_false(TestSuite* ts, int val1, char* file_name, long line_num);
+
+
+/* ============================================================================
+ *  LONG ASSERTIONS
+ * ========================================================================= */
+int assert_equal_long(TestSuite* ts, long val1, long val2, char* file_name, long line_num);
+int assert_not_equal_long(TestSuite* ts, long val1, long val2, char* file_name, long line_num);
+int assert_greater_than_long(TestSuite* ts, long val1, long val2, char* file_name, long line_num);
+
+
 
 #endif

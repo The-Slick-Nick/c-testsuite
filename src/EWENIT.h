@@ -1,6 +1,6 @@
 /*========================================================================================
 EWENIT.c
-Version 2.1.1
+Version 2.2.0
 
 ⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣐⡙⠶⣿⣷⣌⡳⣿⡿⠿⢷⣦⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⣠⡴⠮⠁⠀⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠙⠟⢿⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -47,7 +47,7 @@ Version 2.1.1
 #ifndef INCLUDE_GUARD_EWENIT
 #define INCLUDE_GUARD_EWENIT
 
-#define EWENIT_VERSION "2.1.1"
+#define EWENIT_VERSION "2.2.0"
 
 #include "core.h"
 #include "int_assertions.h"
@@ -72,6 +72,10 @@ TestSuite* ts;
 #define ASSERT_EQUAL_INT(val1, val2)            ERROR_CHECK(assert_equal_int(ts, val1, val2, __FILE__, __LINE__))
 #define ASSERT_NOT_EQUAL_INT(val1, val2)        ERROR_CHECK(assert_not_equal_int(ts, val1, val2, __FILE__, __LINE__))
 #define ASSERT_GREATER_THAN_INT(val1, val2)     ERROR_CHECK(assert_greater_than_int(ts, val1, val2, __FILE__, __LINE__))
+
+#define ASSERT_EQUAL_LONG(val1, val2)            ERROR_CHECK(assert_equal_long(ts, val1, val2, __FILE__, __LINE__))
+#define ASSERT_NOT_EQUAL_LONG(val1, val2)        ERROR_CHECK(assert_not_equal_long(ts, val1, val2, __FILE__, __LINE__))
+#define ASSERT_GREATER_THAN_LONG(val1, val2)     ERROR_CHECK(assert_greater_than_long(ts, val1, val2, __FILE__, __LINE__))
 
 #define ASSERT_TRUE(val1)                       ERROR_CHECK(assert_true(ts, val1, __FILE__, __LINE__))
 #define ASSERT_FALSE(val1)                      ERROR_CHECK(assert_false(ts, val1, __FILE__, __LINE__))
